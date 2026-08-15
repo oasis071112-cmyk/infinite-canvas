@@ -3,6 +3,7 @@
 ## Unreleased
 
 + [新增] 提示词来源新增 Freestylefly GPT Image 2 内置来源。
++ [新增] Render 部署新增受限的 Uozi 同源 API 代理，解决浏览器直连时的跨域限制。
 
 ## v0.15.1 - 2026-08-07
 
