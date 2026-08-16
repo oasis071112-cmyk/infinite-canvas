@@ -1,8 +1,8 @@
 FROM node:22-bookworm-slim AS build
 
 WORKDIR /app
-COPY server/package.json ./
-RUN npm install --no-audit --no-fund
+COPY server/package.json server/package-lock.json ./
+RUN npm ci --no-audit --no-fund
 COPY server/tsconfig.json ./
 COPY server/src ./src
 RUN npm run build && npm prune --omit=dev
