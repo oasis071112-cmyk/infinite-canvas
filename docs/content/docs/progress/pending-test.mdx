@@ -7,6 +7,7 @@ description: Implemented changes that still need manual verification
 
 The current release needs manual verification in these areas:
 
+- Settings contact prompt: opening Settings should first show the API-key guidance and support WeChat QR code; Continue to settings should open the existing settings panel, while Not now or Close should dismiss the flow, with readable content in both themes.
 - Agent, version-link, and audio-generation removal: the app should no longer show Agent entry points, side panels, connection state, or Codex plugin guidance; the version should be static text with no click or update check; settings, model capabilities, generation panels, the plugin SDK, and request code should no longer expose audio generation, while local audio-node upload, playback, replacement, and download should continue to work.
 - IonAiLabs branding: the supplied normal icon should be used as the app and document favicon; light navigation should use `logo-icon.svg`, dark navigation should use `logo-white.svg`, and all current English and Chinese UI names should read `IonAiLabs Infinite Canvas` or `IonAiLabs无限画布`.
 - Removed capabilities and links: the main app should not expose a video route, navigation item, canvas node, asset, upload control, generation mode, model capability, plugin API, Docs button, GitHub button, or canvas Docs menu. Visiting `/video` should show the existing 404 page, while image and text generation, local audio playback and downloads, and documentation-site GitHub links should continue to work.

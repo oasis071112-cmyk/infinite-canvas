@@ -1,6 +1,6 @@
 import { App, Button, Form, Input, Modal, Progress, Tabs } from "antd";
 import type { TFunction } from "i18next";
-import { Cloud, Download, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "lucide-react";
+import { Cloud, Download, KeyRound, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -313,23 +313,52 @@ export function AppConfigModal() {
     const isConfigOpen = useConfigStore((state) => state.isConfigOpen);
     const configTab = useConfigStore((state) => state.configTab);
     const setConfigDialogOpen = useConfigStore((state) => state.setConfigDialogOpen);
+    const [showContact, setShowContact] = useState(true);
+    const closeConfig = () => setConfigDialogOpen(false);
+
     return (
-        <Modal
-            title={
-                <div>
-                    <div className="text-lg font-semibold">{t("config.title")}</div>
-                    <div className="mt-1 text-xs font-normal text-stone-500">{t("config.modalDescription")}</div>
+        <>
+            <Modal open={isConfigOpen && showContact} width={460} centered footer={null} onCancel={closeConfig} styles={{ body: { padding: "28px 24px 24px" } }}>
+                <div className="mx-auto flex max-w-sm flex-col items-center text-center">
+                    <div className="grid size-11 place-items-center rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                        <KeyRound className="size-5" />
+                    </div>
+                    <h2 className="mt-4 text-xl font-semibold tracking-tight text-stone-950 dark:text-stone-100">{t("config.apiKeyContact.title")}</h2>
+                    <p className="mt-2 text-sm leading-6 text-stone-600 dark:text-stone-300">{t("config.apiKeyContact.description")}</p>
+                    <div className="mt-5 aspect-square w-[280px] max-w-full overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm dark:border-stone-700">
+                        <img src="/api-key-contact.jpg" alt={t("config.apiKeyContact.imageAlt")} className="size-full scale-[1.45] object-cover" />
+                    </div>
+                    <p className="mt-3 text-xs text-stone-500 dark:text-stone-400">{t("config.apiKeyContact.scanHint")}</p>
+                    <div className="mt-6 grid w-full grid-cols-2 gap-3">
+                        <Button className="h-10" onClick={closeConfig}>
+                            {t("config.apiKeyContact.later")}
+                        </Button>
+                        <Button type="primary" className="h-10" onClick={() => setShowContact(false)}>
+                            {t("config.apiKeyContact.continue")}
+                        </Button>
+                    </div>
                 </div>
-            }
-            open={isConfigOpen}
-            width={980}
-            centered
-            onCancel={() => setConfigDialogOpen(false)}
-            styles={{ body: { maxHeight: "72vh", overflowY: "auto", paddingRight: 12 } }}
-            footer={null}
-        >
-            <AppConfigPanel showDoneButton initialTab={configTab} />
-        </Modal>
+            </Modal>
+            <Modal
+                title={
+                    <div>
+                        <div className="text-lg font-semibold">{t("config.title")}</div>
+                        <div className="mt-1 text-xs font-normal text-stone-500">{t("config.modalDescription")}</div>
+                    </div>
+                }
+                open={isConfigOpen && !showContact}
+                width={980}
+                centered
+                onCancel={closeConfig}
+                afterClose={() => {
+                    if (!isConfigOpen) setShowContact(true);
+                }}
+                styles={{ body: { maxHeight: "72vh", overflowY: "auto", paddingRight: 12 } }}
+                footer={null}
+            >
+                <AppConfigPanel showDoneButton initialTab={configTab} />
+            </Modal>
+        </>
     );
 }
 

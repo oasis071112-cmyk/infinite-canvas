@@ -2,6 +2,7 @@
 
 ## Unreleased
 
++ [新增] 打开配置时新增 API Key 客服引导弹窗与微信二维码。
 + [新增] 提示词来源新增 Freestylefly GPT Image 2 内置来源。
 + [新增] Render 部署新增受限的 Uozi 同源 API 代理，解决浏览器直连时的跨域限制。
 + [调整] 主应用与文档站统一为 IonAiLabs 品牌，并移除视频能力及主应用文档、GitHub 入口。

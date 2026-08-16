@@ -299,6 +299,14 @@ export default {
         invalidFile: "The settings file format is invalid",
         description: "Providers, model selection, sync, and local storage",
         modalDescription: "Providers, default models, sync, and local storage",
+        apiKeyContact: {
+            title: "Get a dedicated API key",
+            description: "If you do not have an official OpenAI key, contact support for a dedicated API key.",
+            scanHint: "Scan with WeChat to contact support",
+            imageAlt: "Support WeChat QR code",
+            later: "Not now",
+            continue: "Continue to settings",
+        },
         tabs: {
             channels: "Providers",
             preferences: "Preferences",

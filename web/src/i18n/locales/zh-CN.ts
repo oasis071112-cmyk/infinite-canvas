@@ -299,6 +299,14 @@ export default {
         invalidFile: "配置文件格式不正确",
         description: "渠道聚合、模型选择、同步与本地存储",
         modalDescription: "渠道聚合、默认模型、同步与本地存储",
+        apiKeyContact: {
+            title: "获取专属 API Key",
+            description: "如没有 OpenAI 官方 Key，请联系客服获取专属 API Key！",
+            scanHint: "请使用微信扫码添加客服",
+            imageAlt: "客服微信二维码",
+            later: "暂不配置",
+            continue: "继续配置",
+        },
         tabs: {
             channels: "渠道",
             preferences: "偏好设置",
