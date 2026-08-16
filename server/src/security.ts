@@ -54,7 +54,7 @@ export function buildProviderUrl(baseUrl: string, path: "/models" | "/responses"
 
 function assertPublicAddress(value: string) {
     let address = ipaddr.parse(value);
-    if (address.kind() === "ipv6" && address.isIPv4MappedAddress()) address = address.toIPv4Address();
+    if (address instanceof ipaddr.IPv6 && address.isIPv4MappedAddress()) address = address.toIPv4Address();
     if (address.range() !== "unicast") throw new ApiError(400, "PRIVATE_ADDRESS_FORBIDDEN", "中转站地址不能指向内网、回环或保留网络");
 }
 

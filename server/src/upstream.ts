@@ -34,7 +34,6 @@ export async function requestProvider(
         },
         body: options.body,
         signal,
-        maxRedirections: 0,
         headersTimeout: env.upstreamTimeoutMs,
         bodyTimeout: env.upstreamTimeoutMs,
     });

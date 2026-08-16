@@ -38,9 +38,11 @@ app.addHook("onSend", async (_request, reply) => {
 
 app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ApiError) return reply.code(error.statusCode).send({ error: { code: error.code, message: error.message } });
-    const statusCode = typeof error.statusCode === "number" && error.statusCode >= 400 && error.statusCode < 600 ? error.statusCode : 500;
-    app.log.error({ err: error }, "request failed");
-    return reply.code(statusCode).send({ error: { code: statusCode === 500 ? "INTERNAL_ERROR" : "REQUEST_FAILED", message: statusCode === 500 ? "服务器处理请求失败" : error.message } });
+    const normalizedError = error instanceof Error ? error : new Error("Unknown request error");
+    const candidateStatusCode = (normalizedError as Error & { statusCode?: unknown }).statusCode;
+    const statusCode = typeof candidateStatusCode === "number" && candidateStatusCode >= 400 && candidateStatusCode < 600 ? candidateStatusCode : 500;
+    app.log.error({ err: normalizedError }, "request failed");
+    return reply.code(statusCode).send({ error: { code: statusCode === 500 ? "INTERNAL_ERROR" : "REQUEST_FAILED", message: statusCode === 500 ? "服务器处理请求失败" : normalizedError.message } });
 });
 
 await registerRoutes(app);
