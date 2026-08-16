@@ -545,8 +545,8 @@ function toolHistorySummary(tool: string, item: unknown, input: unknown) {
         const summary = field(result, "summary");
         return `共 ${numberValue(field(result, "total"))} 个任务，排队 ${numberValue(field(summary, "queued"))}，运行中 ${numberValue(field(summary, "running"))}，成功 ${numberValue(field(summary, "succeeded"))}，失败 ${numberValue(field(summary, "failed"))}`;
     }
-    if (tool === "workbench_image_generate" || tool === "workbench_video_generate") return String(field(result, "note") || "已在工作台执行");
-    if (tool === "workbench_image_get_config" || tool === "workbench_video_get_config") return "已读取工作台配置";
+    if (tool === "workbench_image_generate") return String(field(result, "note") || "已在工作台执行");
+    if (tool === "workbench_image_get_config") return "已读取工作台配置";
     return "";
 }
 
@@ -557,13 +557,12 @@ function canvasContentSummary(nodes: unknown[], connections: number) {
         result[type] = (result[type] || 0) + 1;
         return result;
     }, {});
-    const known = new Set(["text", "image", "config", "video", "audio", "group"]);
+    const known = new Set(["text", "image", "config", "audio", "group"]);
     const other = Object.entries(counts).reduce((total, [type, count]) => total + (known.has(type) ? 0 : count), 0);
     const parts = [
         counts.text ? `${counts.text} 个文本` : "",
         counts.image ? `${counts.image} 张图片` : "",
         counts.config ? `${counts.config} 个配置` : "",
-        counts.video ? `${counts.video} 个视频` : "",
         counts.audio ? `${counts.audio} 个音频` : "",
         counts.group ? `${counts.group} 个分组` : "",
         other ? `${other} 个其他节点` : "",
@@ -688,7 +687,6 @@ function routeName(path: string) {
     if (path === "/canvas") return "画布页面";
     if (path.startsWith("/canvas/")) return "指定画布";
     if (path.startsWith("/image")) return "生图工作台";
-    if (path.startsWith("/video")) return "视频工作台";
     if (path.startsWith("/prompts")) return "提示词中心";
     if (path.startsWith("/assets")) return "我的素材";
     if (path.startsWith("/config")) return "配置页面";
@@ -717,7 +715,6 @@ function toolName(name: string) {
     if (name === "canvas_create_generation_flow") return "创建生成流程";
     if (name === "canvas_generate_text") return "生成文本";
     if (name === "canvas_generate_image") return "生成图片";
-    if (name === "canvas_generate_video") return "生成视频";
     if (name === "canvas_generate_audio") return "生成音频";
     if (name === "canvas_update_node") return "更新节点";
     if (name === "canvas_update_node_text") return "更新文本";
@@ -730,8 +727,6 @@ function toolName(name: string) {
     if (name === "canvas_run_generation") return "触发生成";
     if (name === "workbench_image_get_config") return "生图配置";
     if (name === "workbench_image_generate") return "生图工作台生成";
-    if (name === "workbench_video_get_config") return "视频配置";
-    if (name === "workbench_video_generate") return "视频创作台生成";
     if (name === "prompts_search") return "搜索提示词";
     if (name === "assets_list") return "资产列表";
     if (name === "assets_add") return "添加资产";

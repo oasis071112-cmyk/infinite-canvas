@@ -1,4 +1,4 @@
-# Infinite Canvas Documentation Index
+# IonAiLabs Infinite Canvas Documentation Index
 
 ## Overview
 

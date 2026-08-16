@@ -1,8 +1,8 @@
-# Infinite Canvas 画布节点插件
+# IonAiLabs Infinite Canvas 画布节点插件
 
 给画布扩展自定义节点。每个插件是一个**独立目录**,用 **TypeScript** 编写,自带 `package.json` / `build.mjs` / `src/index.tsx` / `dist/`,互不耦合,可单独构建、发布、升级。
 
-内置节点只有文本、图片、视频、音频、生成配置、组六种;其余节点(Markdown、SVG、HTML、3D 全景、便利贴……)都是插件。
+内置节点只有文本、图片、音频、生成配置、组五种;其余节点(Markdown、SVG、HTML、3D 全景、便利贴……)都是插件。
 
 作者只写节点 UI 与逻辑,**类型、JSX、宿主 React、构建全部由 [`@infinite-canvas/plugin-sdk`](./sdk/README.md) 提供**,写 TSX 全程有代码提示;产物仍是宿主加载器现有契约的 ESM(React external、宿主单例)。
 
@@ -106,7 +106,7 @@ SDK 导出的 hooks(`useState/useEffect/useMemo/useRef/...`)运行时转发宿�
     showInCreateMenu?: boolean;   // 默认 true
     hasSourceHandle?: boolean;    // 右侧输出连接点,默认 true
     keepAspectRatio?: (node) => boolean;
-    resource?: (node) => { kind: "text"|"image"|"video"|"audio", text?, url? } | null; // 作为上游输入被消费时输出什么
+    resource?: (node) => { kind: "text"|"image"|"audio", text?, url? } | null; // 作为上游输入被消费时输出什么
     Content: ({ ctx }) => ReactNode;         // 节点主体渲染
     Panel?: ({ ctx, onClose }) => ReactNode; // 可选:节点下方面板
     toolbar?: (ctx) => Array<{ id, title, label, icon, onClick, danger? }>; // 追加到 hover 工具栏

@@ -165,8 +165,8 @@ export type PluginVariable = { name: string; type: string; desc: string; capabil
 /** Documentation surface shown in the script editor. */
 export function getPluginVariables(): PluginVariable[] {
     return [
-        { name: "prompt", type: "string", desc: i18n.t("modelPlugin.variables.prompt"), capabilities: ["image", "video", "audio"] },
-        { name: "images", type: "string[]", desc: i18n.t("modelPlugin.variables.images"), capabilities: ["image", "video"] },
+        { name: "prompt", type: "string", desc: i18n.t("modelPlugin.variables.prompt"), capabilities: ["image", "audio"] },
+        { name: "images", type: "string[]", desc: i18n.t("modelPlugin.variables.images"), capabilities: ["image"] },
         { name: "messages", type: "{ role, content }[]", desc: i18n.t("modelPlugin.variables.messages"), capabilities: ["text"] },
         { name: "params", type: "object", desc: i18n.t("modelPlugin.variables.params") },
         { name: "model", type: "string", desc: i18n.t("modelPlugin.variables.model") },
@@ -244,49 +244,6 @@ return (data.candidates || [])
   .map((p) => p.inlineData || p.inline_data)
   .filter(Boolean)
   .map((img) => \`data:\${img.mimeType || img.mime_type || "image/png"};base64,\${img.data}\`);`,
-        },
-    ],
-    video: [
-        {
-            label: i18n.t("modelPlugin.templates.openai"),
-            script: `// ${i18n.t("modelPlugin.templates.videoOpenai")}
-const headers = { "Content-Type": "application/json", Authorization: \`Bearer \${apiKey}\` };
-const task = await request({
-  method: "post",
-  url: \`\${baseUrl}/v1/videos\`,
-  headers,
-  data: { model, prompt, seconds: params.seconds },
-});
-return await poll(
-  () => request({ method: "get", url: \`\${baseUrl}/v1/videos/\${task.id}\`, headers }),
-  (state) => state.status === "completed" ? { url: state.video_url || state.url } : null,
-  { intervalMs: 2500, timeoutMs: 300000 },
-);`,
-        },
-        {
-            label: i18n.t("modelPlugin.templates.gemini"),
-            script: `// ${i18n.t("modelPlugin.templates.videoGemini")}
-// ${i18n.t("modelPlugin.templates.availableVideoGemini")}
-const headers = { "Content-Type": "application/json", "x-goog-api-key": apiKey };
-const instance = { prompt };
-const first = images[0] && images[0].match(/^data:([^;]+);base64,(.*)$/);
-if (first) instance.image = { bytesBase64Encoded: first[2], mimeType: first[1] };
-const op = await request({
-  method: "post",
-  url: \`\${baseUrl}/v1beta/models/\${model}:predictLongRunning\`,
-  headers,
-  data: { instances: [instance], parameters: { aspectRatio: params.ratio } },
-});
-return await poll(
-  () => request({ method: "get", url: \`\${baseUrl}/v1beta/\${op.name}\`, headers }),
-  (state) => {
-    if (!state.done) return null;
-    const uri = state.response?.generateVideoResponse?.generatedSamples?.[0]?.video?.uri;
-    if (!uri) throw new Error(${JSON.stringify(i18n.t("modelPlugin.templates.geminiNoVideoUri"))});
-    return { url: uri.includes("key=") ? uri : \`\${uri}\${uri.includes("?") ? "&" : "?"}key=\${apiKey}\` };
-  },
-  { intervalMs: 5000, timeoutMs: 300000 },
-);`,
         },
     ],
     audio: [

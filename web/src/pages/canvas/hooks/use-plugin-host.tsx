@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, type Dispatch, type MutableRefObject, 
 import { useTranslation } from "react-i18next";
 
 import { requestEdit, requestGeneration, requestImageQuestion, type AiTextMessage } from "@/services/api/image";
-import { requestVideoGeneration, storeGeneratedVideo } from "@/services/api/video";
 import { decodeChannelModel, selectableModelsByCapability, type AiConfig, type ModelCapability } from "@/stores/use-config-store";
 import { buildGenerationConfig } from "@/lib/canvas/canvas-generation-helpers";
 import { buildNodeContext } from "@/lib/canvas/plugin-node-context";
@@ -55,17 +54,6 @@ export function usePluginHost(params: PluginHostParams) {
                 const references = toReferences(options?.references);
                 const items = references.length ? await requestEdit(config, prompt, references, undefined, { signal: options?.signal }) : await requestGeneration(config, prompt, { signal: options?.signal });
                 return { images: items.map((item) => item.dataUrl) };
-            },
-            generateVideo: async (prompt, options) => {
-                const config = {
-                    ...buildGenerationConfig(effectiveConfig, undefined, "video"),
-                    ...(options?.model ? { model: options.model } : {}),
-                    ...(options?.size ? { size: options.size } : {}),
-                    ...(options?.seconds ? { videoSeconds: options.seconds } : {}),
-                };
-                ensureReady(config);
-                const file = await storeGeneratedVideo(await requestVideoGeneration(config, prompt, toReferences(options?.references), [], [], { signal: options?.signal }));
-                return { url: file.url, mimeType: file.mimeType, width: file.width, height: file.height, durationMs: file.durationMs };
             },
             generateText: async (prompt, options) => {
                 const config = { ...buildGenerationConfig(effectiveConfig, undefined, "text"), ...(options?.model ? { model: options.model } : {}) };

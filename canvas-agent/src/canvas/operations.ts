@@ -34,7 +34,7 @@ export function buildCanvasToolRequest(name: ToolName, input: Record<string, unk
         return applyOps([configNodeOp(configId, input, x, y), ...(input.autoRun ? [runGenerationOp(configId, mode, prompt)] : [])]);
     }
     if (name === "canvas_create_generation_flow") return applyOps(generationFlowOps(input, state));
-    if (name === "canvas_generate_text" || name === "canvas_generate_image" || name === "canvas_generate_video" || name === "canvas_generate_audio") {
+    if (name === "canvas_generate_text" || name === "canvas_generate_image" || name === "canvas_generate_audio") {
         return applyOps(generationFlowOps({ ...input, mode: name.replace("canvas_generate_", ""), autoRun: true }, state));
     }
     if (name === "canvas_update_node") {
@@ -107,10 +107,6 @@ function configNodeOp(id: string, input: Record<string, unknown>, x: number, y: 
             size: input.size,
             quality: input.quality,
             count: input.count,
-            seconds: input.seconds,
-            vquality: input.vquality,
-            generateAudio: input.generateAudio,
-            watermark: input.watermark,
             audioVoice: input.audioVoice,
             audioFormat: input.audioFormat,
             audioSpeed: input.audioSpeed,
@@ -140,19 +136,18 @@ function generationFlowOps(input: Record<string, unknown>, state: CanvasSnapshot
 }
 
 /** 创建触发节点生成的画布操作。 */
-function runGenerationOp(nodeId: string, mode: "text" | "image" | "video" | "audio", prompt?: string) {
+function runGenerationOp(nodeId: string, mode: "text" | "image" | "audio", prompt?: string) {
     return { type: "run_generation", nodeId, mode, prompt };
 }
 
 /** 将未知生成模式归一为画布支持的模式。 */
-function generationMode(value: unknown): "text" | "image" | "video" | "audio" {
-    return value === "text" || value === "video" || value === "audio" ? value : "image";
+function generationMode(value: unknown): "text" | "image" | "audio" {
+    return value === "text" || value === "audio" ? value : "image";
 }
 
 /** 获取生成模式对应的默认节点标题。 */
-function generationTitle(mode: "text" | "image" | "video" | "audio") {
+function generationTitle(mode: "text" | "image" | "audio") {
     if (mode === "text") return "文本生成";
-    if (mode === "video") return "视频生成";
     if (mode === "audio") return "音频生成";
     return "图片生成";
 }

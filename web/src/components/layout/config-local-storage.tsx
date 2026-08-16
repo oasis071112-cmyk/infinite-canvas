@@ -11,7 +11,6 @@ const storeLabelKeys: Record<string, string> = {
     image_files: "images",
     media_files: "media",
     image_generation_logs: "imageLogs",
-    video_generation_logs: "videoLogs",
     agent_chat_messages: "agentMessages",
     prompt_cache: "promptCache",
 };

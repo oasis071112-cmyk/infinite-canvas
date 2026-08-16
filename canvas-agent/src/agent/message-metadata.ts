@@ -232,7 +232,7 @@ function normalizeCanvasReference(value: unknown, allowAsset: boolean): AgentCan
     const label = text(item.label, 200);
     const title = text(item.title, 500);
     const kind = String(item.kind || "");
-    if (!nodeId || !label || !title || !["image", "video", "audio", "text"].includes(kind)) return undefined;
+    if (!nodeId || !label || !title || !["image", "audio", "text"].includes(kind)) return undefined;
     const previewUrl = kind === "image" ? imagePreview(item.previewUrl, allowAsset) : remotePreview(item.previewUrl);
     const referenceText = text(item.text, MAX_TEXT_LENGTH);
     return { nodeId, label, title, kind: kind as AgentCanvasReference["kind"], ...(previewUrl ? { previewUrl } : {}), ...(referenceText ? { text: referenceText } : {}) };

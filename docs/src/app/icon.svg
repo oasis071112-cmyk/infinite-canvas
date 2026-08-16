@@ -1,4 +1,45 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M32 8L58 54H46L32 29L18 54H6L32 8Z" fill="currentColor"/>
-  <path d="M32 40L40 54H24L32 40Z" fill="currentColor"/>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7F9F5"/>
+      <stop offset="100%" stop-color="#EDF1E9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- 外环连线 -->
+  <g stroke="#000" stroke-width="1.5" opacity="0.4">
+    <line x1="542" y1="360" x2="702" y2="360"/>
+    <line x1="557" y1="438" x2="607" y2="525"/>
+    <line x1="467" y1="438" x2="417" y2="525"/>
+    <line x1="422" y1="360" x2="322" y2="360"/>
+    <line x1="467" y1="282" x2="417" y2="195"/>
+    <line x1="557" y1="282" x2="607" y2="195"/>
+  </g>
+  <g stroke="#000" stroke-width="1" opacity="0.2">
+    <line x1="542" y1="360" x2="677" y2="455"/><line x1="542" y1="360" x2="677" y2="265"/>
+    <line x1="557" y1="438" x2="702" y2="360"/><line x1="557" y1="438" x2="417" y2="525"/>
+    <line x1="467" y1="438" x2="322" y2="360"/><line x1="467" y1="438" x2="607" y2="525"/>
+    <line x1="422" y1="360" x2="347" y2="455"/><line x1="422" y1="360" x2="347" y2="265"/>
+    <line x1="467" y1="282" x2="322" y2="360"/><line x1="467" y1="282" x2="607" y2="195"/>
+    <line x1="557" y1="282" x2="702" y2="360"/><line x1="557" y1="282" x2="417" y2="195"/>
+  </g>
+  <g fill="#000">
+    <rect x="694" y="352" width="16" height="16" rx="3"/><rect x="599" y="517" width="16" height="16" rx="3"/>
+    <rect x="409" y="517" width="16" height="16" rx="3"/><rect x="314" y="352" width="16" height="16" rx="3"/>
+    <rect x="409" y="187" width="16" height="16" rx="3"/><rect x="599" y="187" width="16" height="16" rx="3"/>
+  </g>
+  <g stroke="#000" stroke-width="2" opacity="0.6">
+    <line x1="512" y1="360" x2="534" y2="360"/><line x1="512" y1="360" x2="549" y2="424"/>
+    <line x1="512" y1="360" x2="475" y2="424"/><line x1="512" y1="360" x2="436" y2="360"/>
+    <line x1="512" y1="360" x2="475" y2="296"/><line x1="512" y1="360" x2="549" y2="296"/>
+  </g>
+  <g fill="#000">
+    <rect x="528" y="354" width="12" height="12" rx="2"/><rect x="543" y="418" width="12" height="12" rx="2"/>
+    <rect x="469" y="418" width="12" height="12" rx="2"/><rect x="430" y="354" width="12" height="12" rx="2"/>
+    <rect x="469" y="290" width="12" height="12" rx="2"/><rect x="543" y="290" width="12" height="12" rx="2"/>
+  </g>
+  <rect x="498" y="346" width="28" height="28" rx="5" fill="#000"/>
+  <text x="512" y="820" text-anchor="middle"
+        font-family="'Helvetica Neue','SF Pro Display',-apple-system,sans-serif"
+        font-size="120" font-weight="700" letter-spacing="14" fill="#000">IonAiLabs</text>
 </svg>

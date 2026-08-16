@@ -23,15 +23,13 @@ export type ConversationState = {
     error?: string;
 };
 type McpInventoryItem = { name: string; authStatus?: string };
-export const AGENT_PROTOCOL_VERSION = 6;
+export const AGENT_PROTOCOL_VERSION = 7;
 
 const SITE_TOOLS = new Set<ToolName>([
     "site_navigate",
     "canvas_list_projects",
     "workbench_image_get_config",
     "workbench_image_generate",
-    "workbench_video_get_config",
-    "workbench_video_generate",
     "prompts_search",
     "assets_list",
     "assets_add",
@@ -152,7 +150,7 @@ export class CanvasSession {
         return this.updateConversation({
             threadId,
             status: hasPending ? "preparing" : requiredFailure ? "failed" : hasFailure ? "warning" : "ready",
-            error: requiredFailure ? `Infinite Canvas MCP 初始化失败${requiredFailureDetail ? `：${requiredFailureDetail}` : ""}` : undefined,
+            error: requiredFailure ? `IonAiLabs Infinite Canvas MCP 初始化失败${requiredFailureDetail ? `：${requiredFailureDetail}` : ""}` : undefined,
         });
     }
 

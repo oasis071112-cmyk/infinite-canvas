@@ -7,55 +7,56 @@ description: Major features available in the current project
 
 ## Canvas projects
 
-- Create, rename, duplicate, delete, import, and export canvas projects.
-- Persist projects in the browser and optionally synchronize them with WebDAV.
-- Keep viewport, background, nodes, connections, and assistant sessions with each project.
+- Create, rename, delete, import, export, and batch-manage canvas projects.
+- Persist nodes, connections, viewport, background, and assistant sessions in the browser.
+- Optionally synchronize canvases, assets, image history, and local media through WebDAV.
 
-## Infinite canvas
+## IonAiLabs Infinite Canvas
 
-- Pan, zoom, reset the view, select multiple nodes, copy and paste, undo and redo.
-- Drag files onto the canvas and use lines, dots, or a blank background.
-- Export the entire canvas or selected elements with their resources.
+- Pan, zoom, reset the view, use the minimap, and choose lines, dots, or a blank background.
+- Select multiple nodes, copy and paste, undo and redo, and export the canvas or selected elements.
+- Connect nodes and highlight upstream and downstream relationships.
 
-## Nodes and workflows
+## Nodes and generation workflows
 
-- Text, image, video, and generation-configuration nodes.
-- Connect text prompts and reference media to generation nodes.
-- Generate or rewrite text, create images, edit images from references, and create videos.
-- Preserve original image ratios by default and organize batch results as connected nodes.
-- Record prompts, models, dimensions, quality, and references on generated nodes for retries.
+Built-in nodes cover text, images, audio, generation configuration, and groups.
+
+- Text nodes store prompts, copy, and AI-generated text.
+- Image nodes display uploaded, generated, or saved images while preserving their original ratio by default.
+- Audio nodes play uploaded or generated audio and support downloads.
+- Configuration nodes combine upstream text, image, and audio inputs with the matching model settings.
+- Group nodes organize related canvas content.
+
+Batch image generation keeps all results in an image group and lets users select the primary result.
 
 ## AI generation
 
-- Connect to user-provided OpenAI-compatible endpoints directly from the browser.
-- Configure multiple channels, fetch or enter model names, and choose default text, image, and video models.
-- Support image count, aspect ratio, quality, transparent backgrounds, reasoning effort, and custom invocation scripts.
-- Support OpenAI-style video endpoints and Volcengine Ark generation tasks.
+- Connect directly from the browser to user-provided compatible endpoints.
+- Use image generation and editing, Responses-based text generation, audio speech generation, and model discovery endpoints.
+- Configure multiple providers and assign image, text, or audio capabilities to each model.
+- Control image quality, aspect ratio, transparent backgrounds, output count, text reasoning effort, audio voice and format, and custom invocation scripts.
+- Keep Volcengine Ark image generation support.
+
+Prompt panels support `@` references to connected images, text, and audio. Image references render as thumbnails and are renumbered automatically when sent.
 
 ## Canvas Agent
 
-- Connect local Codex through Canvas Agent and MCP without giving a web server direct access to browser state.
-- Read the active canvas, selection, nodes, edges, generation status, and apply structured operations.
-- Use Codex from the browser side panel with streaming responses, history, approvals, permissions, diagnostics, and local Skills.
-- Isolate active canvases and turns across multiple browser tabs.
+- Connect local Codex through Canvas Agent and MCP.
+- Read the active canvas, selection, nodes, connections, and generation status.
+- Apply structured operations and start text, image, or audio workflows.
+- Use streaming conversations, history, approvals, permissions, diagnostics, and local Skills in the browser side panel.
 
 See [Codex App Plugin](/docs/overview/codex-app-plugin) for installation and usage.
 
 ## Plugin system
 
-Canvas plugins can contribute node types, rendering, inspectors, serialization, migration, toolbar actions, and optional AI generation capabilities. Built-in and local plugins are managed through the canvas UI.
+Canvas plugins can contribute node types, rendering, inspectors, serialization, toolbar actions, panels, and optional text or image generation capabilities. Built-in and local plugins are managed through the canvas UI.
 
 ## Prompts and assets
 
 - Synchronize supported public prompt repositories and add custom standard JSON sources.
-- Search across enabled sources, filter by tags, inspect prompt details, copy prompts, and insert them into the canvas.
-- Store reusable images, videos, audio, and prompt assets in the browser.
-
-## Configuration and synchronization
-
-- Export and import channel, model, generation, prompt-source, and WebDAV settings.
-- Store application data and API credentials locally in the browser.
-- Use WebDAV for optional cross-device synchronization.
+- Search enabled sources, filter by tags, inspect prompt details, copy prompts, and insert them into the canvas.
+- Store reusable text and image assets in the browser.
 
 ## Current limitations
 

@@ -17,7 +17,7 @@ import { createModelChannel, modelOptionsFromChannels, normalizeModelOptionValue
 
 type ModelGroup = {
     capability: ModelCapability;
-    modelKey: "imageModel" | "videoModel" | "textModel" | "audioModel";
+    modelKey: "imageModel" | "textModel" | "audioModel";
     labelKey: string;
 };
 
@@ -30,12 +30,11 @@ type WebdavDomainProgress = {
 
 const modelGroups: ModelGroup[] = [
     { capability: "image", modelKey: "imageModel", labelKey: "config.preferences.defaultImageModel" },
-    { capability: "video", modelKey: "videoModel", labelKey: "config.preferences.defaultVideoModel" },
     { capability: "text", modelKey: "textModel", labelKey: "config.preferences.defaultTextModel" },
     { capability: "audio", modelKey: "audioModel", labelKey: "config.preferences.defaultAudioModel" },
 ];
 
-const webdavDomainKeys: AppSyncDomainKey[] = ["canvas", "assets", "image-workbench", "video-workbench"];
+const webdavDomainKeys: AppSyncDomainKey[] = ["canvas", "assets", "image-workbench"];
 function createWebdavDomainProgress(): Record<AppSyncDomainKey, WebdavDomainProgress> {
     return webdavDomainKeys.reduce(
         (progress, key) => ({
@@ -152,7 +151,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
         try {
             const result = await syncAppDataToWebdav(webdav, updateWebdavProgress);
             updateWebdavConfig("lastSyncedAt", result.syncedAt);
-            message.success(t("config.webdav.completed", { projects: result.projects, assets: result.assets, records: result.imageLogs + result.videoLogs, files: result.uploadedFiles, bytes: formatBytes(result.uploadedBytes) }));
+            message.success(t("config.webdav.completed", { projects: result.projects, assets: result.assets, records: result.imageLogs, files: result.uploadedFiles, bytes: formatBytes(result.uploadedBytes) }));
         } catch (error) {
             setWebdavSyncStatus(error instanceof Error ? error.message : t("config.webdav.failed"));
             message.error(error instanceof Error ? error.message : t("config.webdav.failed"));
@@ -368,7 +367,6 @@ function withChannels(config: AiConfig, channels: ModelChannel[]): AiConfig {
     return {
         ...next,
         imageModel: pickDefaultModel(next, "image", config.imageModel),
-        videoModel: pickDefaultModel(next, "video", config.videoModel),
         textModel: pickDefaultModel(next, "text", config.textModel),
         audioModel: pickDefaultModel(next, "audio", config.audioModel),
     };
@@ -419,7 +417,6 @@ function WebdavProgressGrid({ progress, t }: { progress: Record<AppSyncDomainKey
 
 function domainTranslationKey(domain: AppSyncDomainKey) {
     if (domain === "image-workbench") return "imageWorkbench";
-    if (domain === "video-workbench") return "videoWorkbench";
     return domain;
 }
 

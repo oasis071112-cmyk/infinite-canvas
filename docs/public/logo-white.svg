@@ -1,0 +1,50 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 外环连线 -->
+  <g stroke="#fff" stroke-width="1.5" opacity="0.5">
+    <line x1="542" y1="440" x2="702" y2="440"/>
+    <line x1="557" y1="518" x2="607" y2="605"/>
+    <line x1="467" y1="518" x2="417" y2="605"/>
+    <line x1="422" y1="440" x2="322" y2="440"/>
+    <line x1="467" y1="362" x2="417" y2="275"/>
+    <line x1="557" y1="362" x2="607" y2="275"/>
+  </g>
+  <!-- 交叉连线 -->
+  <g stroke="#fff" stroke-width="1" opacity="0.25">
+    <line x1="542" y1="440" x2="677" y2="535"/><line x1="542" y1="440" x2="677" y2="345"/>
+    <line x1="557" y1="518" x2="702" y2="440"/><line x1="557" y1="518" x2="417" y2="605"/>
+    <line x1="467" y1="518" x2="322" y2="440"/><line x1="467" y1="518" x2="607" y2="605"/>
+    <line x1="422" y1="440" x2="347" y2="535"/><line x1="422" y1="440" x2="347" y2="345"/>
+    <line x1="467" y1="362" x2="322" y2="440"/><line x1="467" y1="362" x2="607" y2="275"/>
+    <line x1="557" y1="362" x2="702" y2="440"/><line x1="557" y1="362" x2="417" y2="275"/>
+  </g>
+  <!-- 外环节点 -->
+  <g fill="#fff">
+    <rect x="694" y="432" width="16" height="16" rx="3"/>
+    <rect x="599" y="597" width="16" height="16" rx="3"/>
+    <rect x="409" y="597" width="16" height="16" rx="3"/>
+    <rect x="314" y="432" width="16" height="16" rx="3"/>
+    <rect x="409" y="267" width="16" height="16" rx="3"/>
+    <rect x="599" y="267" width="16" height="16" rx="3"/>
+  </g>
+  <!-- 内环连线 -->
+  <g stroke="#fff" stroke-width="2" opacity="0.6">
+    <line x1="512" y1="440" x2="534" y2="440"/><line x1="512" y1="440" x2="549" y2="504"/>
+    <line x1="512" y1="440" x2="475" y2="504"/><line x1="512" y1="440" x2="436" y2="440"/>
+    <line x1="512" y1="440" x2="475" y2="376"/><line x1="512" y1="440" x2="549" y2="376"/>
+  </g>
+  <!-- 内环节点 -->
+  <g fill="#fff">
+    <rect x="528" y="434" width="12" height="12" rx="2"/>
+    <rect x="543" y="498" width="12" height="12" rx="2"/>
+    <rect x="469" y="498" width="12" height="12" rx="2"/>
+    <rect x="430" y="434" width="12" height="12" rx="2"/>
+    <rect x="469" y="370" width="12" height="12" rx="2"/>
+    <rect x="543" y="370" width="12" height="12" rx="2"/>
+  </g>
+  <!-- 中心节点 -->
+  <rect x="498" y="426" width="28" height="28" rx="5" fill="#fff"/>
+  <!-- 品牌文字 -->
+  <text x="512" y="830" text-anchor="middle"
+        font-family="'Helvetica Neue','SF Pro Display',-apple-system,sans-serif"
+        font-size="120" font-weight="700" letter-spacing="14" fill="#fff">IonAiLabs</text>
+</svg>

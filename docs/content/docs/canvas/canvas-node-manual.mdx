@@ -7,30 +7,33 @@ description: Main canvas node workflows and operations
 
 ## Text nodes
 
-Text nodes store prompts, drafts, descriptions, and AI-generated text. Double-click the content or select **Edit Text** in the toolbar to edit it. The toolbar also controls text size.
-
-Select **Edit** to open the prompt panel below the node:
+Text nodes store prompts, drafts, descriptions, and AI-generated text. Double-click the content or select **Edit Text** to edit it.
 
 - An empty node generates text into itself.
-- Editing an existing node creates a connected result node to the right, preserving the original.
-- Use `@` to reference connected images, text, video, or audio. Image references appear as thumbnails and are numbered automatically when sent to the model.
-- The model selection applies only to the current node. Fetch or enter model names in global Settings first.
-
-To generate an image from text, prepare the prompt and select **Generate Image**. Infinite Canvas creates and connects a generation configuration node, starts generation, and lets you adjust the model, aspect ratio, and output count before retrying.
+- Editing existing content creates a connected result node and preserves the original.
+- Use `@` to reference connected images, text, or audio. Image references render as thumbnails and are numbered automatically when sent.
+- A model selected on the node does not change the global default.
 
 ## Image nodes
 
-- Generating from an empty image node writes the first result into that node.
-- A single result replaces the current empty node; multiple results use it as the primary node and add result nodes to the right.
-- A populated image node is reused as a reference image.
-- Generated nodes record the prompt, generation type, model, size, quality, count, and references in `metadata`.
-- A retry stops with a clear warning if required references can no longer be restored.
+- Upload, drop, or insert images from **My Assets**.
+- Generate into an empty image node or reuse an existing image as a reference.
+- Keep multiple results in an image group and select the primary image.
+- Record prompt, generation type, model, size, quality, count, and references for retries.
+- Replace, download, save, crop, mask-edit, split, upscale, super-resolve, or generate alternate angles.
 
-## Video nodes
+## Audio nodes
 
-Create a video node from the toolbar or upload a local video. Video nodes use the native player. An empty video node can generate into itself, while generation started from text, images, or configuration nodes creates a connected video node.
+- Upload or drop MP3/WAV files, or generate audio with a configured audio model.
+- Play audio through the native player.
+- Replace or download the current audio.
+- Audio configuration nodes use upstream text with the selected model and voice settings.
 
-The OpenAI-compatible flow uses `POST /v1/videos`, `GET /v1/videos/{id}`, and `GET /v1/videos/{id}/content`. For Volcengine Ark Agent Plan and Seedance 2.0, use `https://ark.cn-beijing.volces.com/api/plan/v3` and enter the model name manually because this endpoint does not expose OpenAI's `/models` API.
+## Generation configuration nodes
+
+- Switch between image, text, and audio modes.
+- Read connected text, image, and audio inputs and select references with `@`.
+- Choose the matching model and parameters, then start or stop generation.
 
 ## Recommended workflow
 
@@ -38,4 +41,4 @@ The OpenAI-compatible flow uses `POST /v1/videos`, `GET /v1/videos/{id}`, and `G
 2. Ask AI to refine the prompt in the panel below it.
 3. Compare the connected rewritten node with the original.
 4. Select **Generate Image** on the chosen text node.
-5. Adjust parameters or regenerate from the generated configuration node.
+5. Adjust parameters or regenerate from the connected configuration node.

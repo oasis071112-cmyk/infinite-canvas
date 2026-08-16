@@ -1,4 +1,4 @@
-// Infinite Canvas 插件公共契约类型。
+// IonAiLabs Infinite Canvas 插件公共契约类型。
 //
 // 这是插件作者面向的「公开接口」子集,自包含、不依赖宿主 `@/` 内部模块,
 // 因此可以被独立构建的插件包直接 import,获得完整的 TS 提示。
@@ -17,11 +17,11 @@ export type Position = { x: number; y: number };
 export type ViewportTransform = { x: number; y: number; k: number };
 
 // 内置节点类型;插件节点建议用 "<pluginId>:<name>"。放开为字符串以便扩展。
-export type CanvasBuiltinNodeType = "image" | "text" | "config" | "video" | "audio" | "group";
+export type CanvasBuiltinNodeType = "image" | "text" | "config" | "audio" | "group";
 export type CanvasNodeTypeId = CanvasBuiltinNodeType | (string & {});
 
 export type CanvasNodeStatus = "idle" | "success" | "loading" | "error";
-export type CanvasGenerationMode = "text" | "image" | "video" | "audio";
+export type CanvasGenerationMode = "text" | "image" | "audio";
 export type CanvasImageGenerationType = "generation" | "edit";
 
 // 节点 metadata 是扁平可选字段袋;插件自定义字段可直接写入(内容惯例放 content)。
@@ -38,10 +38,6 @@ export type CanvasNodeMetadata = {
     size?: string;
     quality?: string;
     count?: number;
-    seconds?: string;
-    vquality?: string;
-    generateAudio?: string;
-    watermark?: string;
     audioVoice?: string;
     audioFormat?: string;
     audioSpeed?: string;
@@ -132,18 +128,18 @@ export type CanvasAgentOp =
 // 资源:插件节点作为上游输入被消费时输出什么(接入生成/引用体系)
 // ---------------------------------------------------------------------------
 
-export type CanvasResourceKind = "image" | "video" | "audio" | "text";
+export type CanvasResourceKind = "image" | "audio" | "text";
 export type CanvasNodeResource = { kind: CanvasResourceKind; text?: string; url?: string };
 
 // ---------------------------------------------------------------------------
-// AI 生成:插件直接复用宿主的模型/密钥配置发起生成(生图/生视频/生文本/生音频)
+// AI 生成:插件直接复用宿主的模型/密钥配置发起生成(生图/生文本)
 //
 // 插件本身拿不到 API Key 与模型配置,这些能力由宿主注入。前置/系统提示词由
 // 插件自行拼进 prompt(宿主不感知),因此不同插件可各自定制自己的提示词策略。
 // 若宿主 AI 配置未就绪,会抛错(并由宿主提示用户去配置),插件用 try/catch 处理即可。
 // ---------------------------------------------------------------------------
 
-// 生成公共可选项;references 为图生图/图生视频的参考图(dataURL 或可访问 URL)
+// 生成公共可选项;references 为图生图的参考图(dataURL 或可访问 URL)
 export type GenerateOptions = {
     signal?: AbortSignal;
     references?: string[];
@@ -160,19 +156,6 @@ export type GenerateImageResult = {
     images: string[];
 };
 
-export type GenerateVideoOptions = GenerateOptions & {
-    size?: string;
-    seconds?: string;
-};
-
-export type GenerateVideoResult = {
-    url: string; // 视频可访问 URL
-    mimeType: string;
-    width?: number;
-    height?: number;
-    durationMs?: number;
-};
-
 export type GenerateTextOptions = {
     signal?: AbortSignal;
     model?: string;
@@ -185,13 +168,12 @@ export type GenerateTextResult = {
 };
 
 // 一个可选模型:value 传回给 generateXxx({ model }),label 用于展示
-export type ModelCapability = "image" | "video" | "text" | "audio";
+export type ModelCapability = "image" | "text" | "audio";
 export type ModelOption = { value: string; label: string };
 
 // 宿主注入的 AI 生成能力,挂在 ctx.ai 下。任何插件均可调用。
 export type CanvasPluginAi = {
     generateImage: (prompt: string, options?: GenerateImageOptions) => Promise<GenerateImageResult>;
-    generateVideo: (prompt: string, options?: GenerateVideoOptions) => Promise<GenerateVideoResult>;
     generateText: (prompt: string, options?: GenerateTextOptions) => Promise<GenerateTextResult>;
     // 列出某能力下用户已配置的可选模型;不传能力则返回全部
     listModels: (capability?: ModelCapability) => ModelOption[];
@@ -228,7 +210,7 @@ export type CanvasNodeContext = {
     // 节点间/插件间通信
     emit: (event: string, payload?: unknown) => void;
     on: (event: string, handler: (payload: unknown) => void) => () => void;
-    // AI 生成能力(生图/生视频/生文本),复用宿主模型配置
+    // AI 生成能力(生图/生文本),复用宿主模型配置
     ai: CanvasPluginAi;
     // 打开/关闭本节点下方的自定义 Panel(需在节点定义里提供 Panel)
     openPanel: () => void;
@@ -254,10 +236,10 @@ export type CanvasNodeToolbarItem = {
 export type CanvasNodeContentProps = { ctx: CanvasNodeContext };
 export type CanvasNodePanelProps = { ctx: CanvasNodeContext; onClose: () => void };
 
-// 复用宿主内置生成面板(与图片/视频/文本节点同一个组件:模型选择、参数设置、
+// 复用宿主内置生成面板(与图片/文本/音频节点同一个组件:模型选择、参数设置、
 // 提示词库、运行/停止状态全部一致)。声明它即可获得完整生成体验,无需自写面板。
 export type CanvasBuiltinPanelConfig = {
-    mode: "image" | "video" | "text" | "audio"; // 生成类型,决定面板里的模型/设置项
+    mode: "image" | "text" | "audio"; // 生成类型,决定面板里的模型/设置项
     // 提交给模型前自动拼在用户提示词前面的固定前缀(如全景图的 equirectangular 约束)
     promptPrefix?: string;
     // true(默认)时生成结果写回本节点自身 metadata.content;false 则按内置逻辑生成到下游新节点

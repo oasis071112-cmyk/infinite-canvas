@@ -8,7 +8,7 @@ export type AgentAttachment = { id?: string; name?: string; type?: string; size?
 export type AgentAttachmentDisplay = { id: string; name: string; type?: string; size?: number; width?: number; height?: number; url: string };
 
 /** 用户消息引用的画布素材。 */
-export type AgentCanvasReference = { nodeId: string; label: string; title: string; kind: "image" | "video" | "audio" | "text"; previewUrl?: string; text?: string };
+export type AgentCanvasReference = { nodeId: string; label: string; title: string; kind: "image" | "audio" | "text"; previewUrl?: string; text?: string };
 
 /** 用户消息调用的 Codex Skill。 */
 export type AgentSkillReference = { name: string; path: string; displayName?: string };
