@@ -19,7 +19,7 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
         { label: "Gemini", value: "gemini" },
         { label: t("config.protocols.ark"), value: "ark" },
     ];
-    const capabilityOptions: Array<{ label: string; value: ModelCapability }> = ["image", "text", "audio"].map((value) => ({ label: t(`config.channelEditor.capabilities.${value}`), value: value as ModelCapability }));
+    const capabilityOptions: Array<{ label: string; value: ModelCapability }> = ["image", "text"].map((value) => ({ label: t(`config.channelEditor.capabilities.${value}`), value: value as ModelCapability }));
 
     useEffect(() => {
         if (open && channel) setDraft(channel);

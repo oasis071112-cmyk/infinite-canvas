@@ -46,7 +46,7 @@ const messages = {
   'zh-CN': {
     eyebrow: '开源 AI 图片创作工作台',
     center: '文档中心',
-    description: '面向多模态创作的 IonAiLabs无限画布，把画布编排、AI 图片、文本与音频生成、参考图编辑、提示词库和素材沉淀放在同一个工作流里。',
+    description: '面向多模态创作的 IonAiLabs无限画布，把画布编排、AI 图片与文本生成、音频素材、参考图编辑、提示词库和素材沉淀放在同一个工作流里。',
     quickStart: '快速开始',
     demo: '在线体验',
     gallery: '效果展示',

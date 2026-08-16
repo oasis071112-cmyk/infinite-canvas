@@ -26,14 +26,12 @@ type CanvasProject = {
   updatedAt: string;
   nodes: CanvasNodeData[];
   connections: CanvasConnection[];
-  chatSessions: CanvasAssistantSession[];
-  activeChatId: string | null;
   backgroundMode: "lines" | "dots" | "blank";
   viewport: { x: number; y: number; k: number };
 };
 ```
 
-画布项目保存节点、连线、助手会话、背景模式和视口变换。节点位置和尺寸使用画布世界坐标，视口中的 `x/y` 是屏幕平移，`k` 是缩放比例。
+画布项目保存节点、连线、背景模式和视口变换。节点位置和尺寸使用画布世界坐标，视口中的 `x/y` 是屏幕平移，`k` 是缩放比例。
 
 ## 节点与连线
 
@@ -57,16 +55,12 @@ type CanvasConnection = {
 
 内置节点包含图片、文本、生成配置、音频和分组；插件节点使用带插件命名空间的字符串。连线只保存起点和终点节点 ID，删除节点时同步删除相关连线。
 
-常用元信息包括内容、提示词、状态、生成模式、模型、图片尺寸和质量、生成数量、音频声音和格式、图片组、`storageKey`、MIME 类型与文件大小。生成模式为 `text`、`image` 或 `audio`。
+常用元信息包括内容、提示词、状态、生成模式、模型、图片尺寸和质量、生成数量、图片组、`storageKey`、MIME 类型与文件大小。生成模式为 `text` 或 `image`；音频节点只保存本地媒体信息。
 
 批量生图仍保存为一个图片节点。请求开始前会创建全部图片槽位，每个槽位独立记录状态、错误与图片数据；`primaryImageId` 指定主图，最先成功的图片会立即成为主图。
-
-## 助手会话
-
-助手会话保存在画布项目内。消息按角色保存文本、详情和画布引用；引用图片与助手生成图片遵循同一套图片存储规则。只有接口需要 base64 时，才会临时把 Blob URL 转成 data URL。
 
 ## 媒体生命周期
 
 `uploadImage()` 会把 Blob 或 data URL 写入 `image_files`，生成 `image:<id>` 格式的 `storageKey`，创建当前会话使用的对象 URL，并读取图片尺寸和文件信息。音频文件写入 `media_files`，通过独立的 `storageKey` 恢复。
 
-清理采用引用计数思路：删除节点、画布、素材或助手会话后，应用收集仍被引用的 `storageKey`，删除未引用的本地 Blob，并撤销对应对象 URL，避免误删仍被其他画布内容复用的文件。
+清理采用引用计数思路：删除节点、画布或素材后，应用收集仍被引用的 `storageKey`，删除未引用的本地 Blob，并撤销对应对象 URL，避免误删仍被其他画布内容复用的文件。

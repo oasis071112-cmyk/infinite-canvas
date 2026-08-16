@@ -6,7 +6,7 @@ import { nanoid } from "nanoid";
 import i18n from "@/i18n";
 
 export type ApiCallFormat = "openai" | "gemini" | "ark";
-export type ModelCapability = "image" | "text" | "audio";
+export type ModelCapability = "image" | "text";
 export type ReasoningEffort = "auto" | "low" | "medium" | "high" | "xhigh";
 
 export type ChannelModel = {
@@ -33,11 +33,6 @@ export type AiConfig = {
     model: string;
     imageModel: string;
     textModel: string;
-    audioModel: string;
-    audioVoice: string;
-    audioFormat: string;
-    audioSpeed: string;
-    audioInstructions: string;
     systemPrompt: string;
     reasoningEffort: ReasoningEffort;
     models: string[];
@@ -78,21 +73,15 @@ export const defaultConfig: AiConfig = {
             models: [
                 { name: "gpt-image-2", capability: "image" },
                 { name: "gpt-5.5", capability: "text" },
-                { name: "gpt-4o-mini-tts", capability: "audio" },
             ],
         },
     ],
     model: "default::gpt-image-2",
     imageModel: "default::gpt-image-2",
     textModel: "default::gpt-5.5",
-    audioModel: "default::gpt-4o-mini-tts",
-    audioVoice: "alloy",
-    audioFormat: "mp3",
-    audioSpeed: "1",
-    audioInstructions: "",
     systemPrompt: "",
     reasoningEffort: "auto",
-    models: ["default::gpt-image-2", "default::gpt-5.5", "default::gpt-4o-mini-tts"],
+    models: ["default::gpt-image-2", "default::gpt-5.5"],
     quality: "auto",
     size: "1:1",
     background: "",
@@ -122,13 +111,11 @@ type ConfigStore = {
     clearPromptContinue: () => void;
 };
 
-const AUDIO_KEYWORDS = ["audio", "tts", "speech", "voice", "music", "sound"];
 const IMAGE_KEYWORDS = ["seedream", "gpt-image", "image", "dall-e", "dalle", "imagen", "flux", "sdxl", "stable-diffusion", "midjourney"];
 
 /** Best-effort default capability for a freshly fetched model name; user can override in the channel editor. */
 export function guessCapability(name: string): ModelCapability {
     const value = name.toLowerCase();
-    if (AUDIO_KEYWORDS.some((keyword) => value.includes(keyword))) return "audio";
     if (IMAGE_KEYWORDS.some((keyword) => value.includes(keyword))) return "image";
     return "text";
 }
@@ -151,8 +138,8 @@ export function modelMatchesCapability(config: AiConfig, value: string, capabili
 }
 
 export function resolveModelForCapability(config: AiConfig, currentModel: string | undefined, capability: ModelCapability) {
-    const defaultModel = capability === "image" ? config.imageModel : capability === "audio" ? config.audioModel : config.textModel;
-    const fallbackModel = capability === "image" ? defaultConfig.imageModel : capability === "audio" ? defaultConfig.audioModel : defaultConfig.textModel;
+    const defaultModel = capability === "image" ? config.imageModel : config.textModel;
+    const fallbackModel = capability === "image" ? defaultConfig.imageModel : defaultConfig.textModel;
     if (currentModel && modelMatchesCapability(config, currentModel, capability)) return currentModel;
     if (defaultModel && modelMatchesCapability(config, defaultModel, capability)) return defaultModel;
     return fallbackModel;
@@ -207,8 +194,24 @@ export const useConfigStore = create<ConfigStore>()(
                 const persistedState = (persisted || {}) as Partial<ConfigStore>;
                 const persistedConfig = (persistedState.config || {}) as Partial<AiConfig>;
                 const persistedWebdav = (persistedState.webdav || {}) as Partial<WebdavSyncConfig>;
-                const config = { ...defaultConfig, ...persistedConfig };
-                if (!Array.isArray(persistedConfig.channels)) config.channels = [];
+                const config: AiConfig = {
+                    channelMode: "local",
+                    baseUrl: persistedConfig.baseUrl ?? defaultConfig.baseUrl,
+                    apiKey: persistedConfig.apiKey ?? defaultConfig.apiKey,
+                    apiFormat: normalizeApiFormat(persistedConfig.apiFormat),
+                    channels: Array.isArray(persistedConfig.channels) ? persistedConfig.channels : [],
+                    model: persistedConfig.imageModel ?? defaultConfig.imageModel,
+                    imageModel: persistedConfig.imageModel ?? defaultConfig.imageModel,
+                    textModel: persistedConfig.textModel ?? defaultConfig.textModel,
+                    systemPrompt: persistedConfig.systemPrompt ?? defaultConfig.systemPrompt,
+                    reasoningEffort: persistedConfig.reasoningEffort ?? defaultConfig.reasoningEffort,
+                    models: Array.isArray(persistedConfig.models) ? persistedConfig.models : defaultConfig.models,
+                    quality: persistedConfig.quality ?? defaultConfig.quality,
+                    size: persistedConfig.size ?? defaultConfig.size,
+                    background: persistedConfig.background ?? defaultConfig.background,
+                    count: persistedConfig.count ?? defaultConfig.count,
+                    canvasImageCount: persistedConfig.canvasImageCount ?? defaultConfig.canvasImageCount,
+                };
                 const channels = normalizeChannels(config);
                 const models = modelOptionsFromChannels(channels);
                 return {
@@ -222,11 +225,6 @@ export const useConfigStore = create<ConfigStore>()(
                         models,
                         imageModel: normalizeModelOptionValue(config.imageModel || config.model, channels),
                         textModel: normalizeModelOptionValue(config.textModel || config.model, channels),
-                        audioModel: normalizeModelOptionValue(config.audioModel || defaultConfig.audioModel, channels),
-                        audioVoice: config.audioVoice || defaultConfig.audioVoice,
-                        audioFormat: config.audioFormat || defaultConfig.audioFormat,
-                        audioSpeed: config.audioSpeed || defaultConfig.audioSpeed,
-                        audioInstructions: config.audioInstructions || "",
                         reasoningEffort: config.reasoningEffort || "auto",
                         canvasImageCount: config.canvasImageCount || "3",
                     },
@@ -248,8 +246,9 @@ export function normalizeChannelModels(models: Array<string | ChannelModel> | un
     for (const item of models || []) {
         const name = (typeof item === "string" ? item : item?.name || "").trim();
         if (!name || seen.has(name)) continue;
+        if (typeof item !== "string" && item.capability !== "image" && item.capability !== "text") continue;
         seen.add(name);
-        const capability = typeof item === "string" ? guessCapability(name) : item.capability || guessCapability(name);
+        const capability = typeof item === "string" ? guessCapability(name) : item.capability;
         const script = typeof item === "string" ? undefined : item.script?.trim() || undefined;
         result.push({ name, capability, script });
     }
@@ -345,7 +344,7 @@ function normalizeChannels(config: AiConfig) {
                 baseUrl: config.baseUrl || defaultConfig.baseUrl,
                 apiKey: config.apiKey || "",
                 apiFormat: config.apiFormat || defaultConfig.apiFormat,
-                models: normalizeChannelModels([config.model, config.imageModel, config.textModel, config.audioModel].map(modelOptionName)),
+                models: normalizeChannelModels([config.imageModel, config.textModel].map(modelOptionName)),
             }),
         );
     }

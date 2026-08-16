@@ -21,7 +21,7 @@ export type CanvasBuiltinNodeType = "image" | "text" | "config" | "audio" | "gro
 export type CanvasNodeTypeId = CanvasBuiltinNodeType | (string & {});
 
 export type CanvasNodeStatus = "idle" | "success" | "loading" | "error";
-export type CanvasGenerationMode = "text" | "image" | "audio";
+export type CanvasGenerationMode = "text" | "image";
 export type CanvasImageGenerationType = "generation" | "edit";
 
 // 节点 metadata 是扁平可选字段袋;插件自定义字段可直接写入(内容惯例放 content)。
@@ -38,10 +38,6 @@ export type CanvasNodeMetadata = {
     size?: string;
     quality?: string;
     count?: number;
-    audioVoice?: string;
-    audioFormat?: string;
-    audioSpeed?: string;
-    audioInstructions?: string;
     references?: string[];
     naturalWidth?: number;
     naturalHeight?: number;
@@ -111,10 +107,10 @@ export type CanvasTheme = {
 };
 
 // ---------------------------------------------------------------------------
-// 画布指令集(ctx.applyOps):与 AI Agent 同级的画布操作能力
+// 画布操作集(ctx.applyOps)
 // ---------------------------------------------------------------------------
 
-export type CanvasAgentOp =
+export type CanvasOperation =
     | { type: "add_node"; id?: string; nodeType?: CanvasNodeTypeId; title?: string; position?: { x: number; y: number }; x?: number; y?: number; width?: number; height?: number; metadata?: CanvasNodeMetadata }
     | { type: "update_node"; id: string; patch?: Partial<CanvasNodeData>; metadata?: CanvasNodeMetadata }
     | { type: "delete_node"; id?: string; ids?: string[]; nodeType?: CanvasNodeTypeId }
@@ -168,7 +164,7 @@ export type GenerateTextResult = {
 };
 
 // 一个可选模型:value 传回给 generateXxx({ model }),label 用于展示
-export type ModelCapability = "image" | "text" | "audio";
+export type ModelCapability = "image" | "text";
 export type ModelOption = { value: string; label: string };
 
 // 宿主注入的 AI 生成能力,挂在 ctx.ai 下。任何插件均可调用。
@@ -205,8 +201,8 @@ export type CanvasNodeContext = {
     getConnections: () => CanvasConnection[];
     getUpstream: () => CanvasNodeData[];
     getDownstream: () => CanvasNodeData[];
-    // 画布操作(复用 Agent 指令集)
-    applyOps: (ops: CanvasAgentOp[]) => void;
+    // 画布操作
+    applyOps: (ops: CanvasOperation[]) => void;
     // 节点间/插件间通信
     emit: (event: string, payload?: unknown) => void;
     on: (event: string, handler: (payload: unknown) => void) => () => void;
@@ -236,10 +232,10 @@ export type CanvasNodeToolbarItem = {
 export type CanvasNodeContentProps = { ctx: CanvasNodeContext };
 export type CanvasNodePanelProps = { ctx: CanvasNodeContext; onClose: () => void };
 
-// 复用宿主内置生成面板(与图片/文本/音频节点同一个组件:模型选择、参数设置、
+// 复用宿主内置生成面板(与图片/文本节点同一个组件:模型选择、参数设置、
 // 提示词库、运行/停止状态全部一致)。声明它即可获得完整生成体验,无需自写面板。
 export type CanvasBuiltinPanelConfig = {
-    mode: "image" | "text" | "audio"; // 生成类型,决定面板里的模型/设置项
+    mode: "image" | "text"; // 生成类型,决定面板里的模型/设置项
     // 提交给模型前自动拼在用户提示词前面的固定前缀(如全景图的 equirectangular 约束)
     promptPrefix?: string;
     // true(默认)时生成结果写回本节点自身 metadata.content;false 则按内置逻辑生成到下游新节点

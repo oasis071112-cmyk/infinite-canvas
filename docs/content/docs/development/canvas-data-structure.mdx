@@ -19,14 +19,12 @@ type CanvasProject = {
   updatedAt: string;
   nodes: CanvasNodeData[];
   connections: CanvasConnection[];
-  chatSessions: CanvasAssistantSession[];
-  activeChatId: string | null;
   backgroundMode: "lines" | "dots" | "blank";
   viewport: { x: number; y: number; k: number };
 };
 ```
 
-Projects persist nodes, connections, assistant sessions, the background mode, and the viewport. Node positions and sizes use canvas-world coordinates; viewport `x` and `y` are screen translations and `k` is the scale.
+Projects persist nodes, connections, the background mode, and the viewport. Node positions and sizes use canvas-world coordinates; viewport `x` and `y` are screen translations and `k` is the scale.
 
 ## Nodes and connections
 
@@ -50,16 +48,12 @@ type CanvasConnection = {
 
 Built-in nodes cover images, text, generation configuration, audio, and groups. Plugins use namespaced node type strings. Connections store only endpoint IDs and are removed with their connected nodes.
 
-Common metadata includes content, prompt, status, generation mode, model, image size and quality, output count, audio voice and format, image groups, `storageKey`, MIME type, and byte size. Generation mode is `text`, `image`, or `audio`.
+Common metadata includes content, prompt, status, generation mode, model, image size and quality, output count, image groups, `storageKey`, MIME type, and byte size. Generation mode is `text` or `image`; audio nodes only store local media metadata.
 
 A multi-image generation remains one image node. It creates every result slot before requests begin, tracks each slot independently, and uses `primaryImageId` to select the main result. The first successful image becomes primary immediately.
-
-## Assistant sessions
-
-Assistant sessions live inside each canvas project. Messages retain their role, text, detail, and canvas references. Referenced and generated images use the same image-storage rules and are converted to data URLs only when an endpoint requires base64.
 
 ## Media lifecycle
 
 `uploadImage()` stores a Blob or data URL in `image_files`, creates an `image:<id>` storage key and a session-scoped object URL, and reads the image dimensions and file metadata. Audio files are stored in `media_files` and restored through their own storage keys.
 
-Cleanup is reference-based. After nodes, canvases, assets, or assistant sessions are deleted, the application collects every still-referenced storage key, removes unreferenced blobs, and revokes their object URLs. This prevents deleting a file that another canvas feature still uses.
+Cleanup is reference-based. After nodes, canvases, or assets are deleted, the application collects every still-referenced storage key, removes unreferenced blobs, and revokes their object URLs. This prevents deleting a file that another canvas feature still uses.

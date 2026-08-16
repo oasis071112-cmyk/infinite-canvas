@@ -8,7 +8,7 @@ description: Major features available in the current project
 ## Canvas projects
 
 - Create, rename, delete, import, export, and batch-manage canvas projects.
-- Persist nodes, connections, viewport, background, and assistant sessions in the browser.
+- Persist nodes, connections, viewport, and background in the browser.
 - Optionally synchronize canvases, assets, image history, and local media through WebDAV.
 
 ## IonAiLabs Infinite Canvas
@@ -23,7 +23,7 @@ Built-in nodes cover text, images, audio, generation configuration, and groups.
 
 - Text nodes store prompts, copy, and AI-generated text.
 - Image nodes display uploaded, generated, or saved images while preserving their original ratio by default.
-- Audio nodes play uploaded or generated audio and support downloads.
+- Audio nodes play uploaded audio and support replacement and downloads.
 - Configuration nodes combine upstream text, image, and audio inputs with the matching model settings.
 - Group nodes organize related canvas content.
 
@@ -32,21 +32,12 @@ Batch image generation keeps all results in an image group and lets users select
 ## AI generation
 
 - Connect directly from the browser to user-provided compatible endpoints.
-- Use image generation and editing, Responses-based text generation, audio speech generation, and model discovery endpoints.
-- Configure multiple providers and assign image, text, or audio capabilities to each model.
-- Control image quality, aspect ratio, transparent backgrounds, output count, text reasoning effort, audio voice and format, and custom invocation scripts.
+- Use image generation and editing, Responses-based text generation, and model discovery endpoints.
+- Configure multiple providers and assign image or text capabilities to each model.
+- Control image quality, aspect ratio, transparent backgrounds, output count, text reasoning effort, and custom invocation scripts.
 - Keep Volcengine Ark image generation support.
 
 Prompt panels support `@` references to connected images, text, and audio. Image references render as thumbnails and are renumbered automatically when sent.
-
-## Canvas Agent
-
-- Connect local Codex through Canvas Agent and MCP.
-- Read the active canvas, selection, nodes, connections, and generation status.
-- Apply structured operations and start text, image, or audio workflows.
-- Use streaming conversations, history, approvals, permissions, diagnostics, and local Skills in the browser side panel.
-
-See [Codex App Plugin](/docs/overview/codex-app-plugin) for installation and usage.
 
 ## Plugin system
 
