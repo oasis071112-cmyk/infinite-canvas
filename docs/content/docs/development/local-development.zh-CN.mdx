@@ -1,40 +1,40 @@
 ---
 title: 本地开发
-description: 前端优先的本地开发方式
+description: 本地运行 Vite 前端与 Node API
 ---
 
 # 本地开发
 
-当前主应用以 `web/` 前端为主，AI 请求由浏览器前台直连用户自己的 OpenAI 兼容接口。
+请使用 Node.js 22，前端与后端分别安装依赖。
 
-## 1. 启动前端
+## 推荐预览方式
 
 ```bash
-cd web
-bun install
-bun run dev
+docker compose -f docker-compose.local.yml up --build
 ```
 
-前端默认访问：
+打开 `http://localhost:3000`。
+
+## 源码运行
+
+分别安装依赖：
+
+```bash
+cd server
+npm install
+cd ../web
+bun install
+```
+
+启动 API 前设置以下开发环境变量：
 
 ```text
-http://localhost:3000
+API_KEY_MASTER_KEY=<32 字节 Base64 值>
+APP_ORIGIN=http://localhost:3000
+COOKIE_SECURE=false
+DATABASE_PATH=./data/ionailabs-canvas.sqlite
 ```
 
-## 2. 配置模型
+先在 `server/` 执行 `npm run dev`，再在 `web/` 执行 `bun run dev`。Vite 会把 `/api` 转发到 `http://localhost:4000`。
 
-打开右上角配置弹窗，填写自己的 `Base URL`、`API Key` 和模型名。第三方提示词和 WebDAV 都由浏览器前端直连。
-
-## 3. 启动文档站
-
-如果需要单独调整文档站，在 `docs` 目录执行：
-
-```bash
-bun run dev
-```
-
-## 常见场景
-
-- 改画布、页面和交互：主要看 `web/`
-- 改提示词缓存：主要看 `web/src/services/api/prompts.ts`
-- 改文档站内容：主要看 `docs/content/docs/`
+不要在生产环境复用开发主密钥。源码开发时，画布和媒体仍保存在浏览器；只有匿名会话、加密渠道、模型分配和调用摘要会写入本地 SQLite。

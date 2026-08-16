@@ -1,52 +1,75 @@
-import { Button, Drawer, Input, Segmented, Select, Space } from "antd";
+import { App, Button, Drawer, Input, Segmented, Space } from "antd";
 import { ListPlus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { defaultBaseUrlForApiFormat, guessCapability, normalizeChannelModels, type ApiCallFormat, type ChannelModel, type ModelCapability, type ModelChannel } from "@/stores/use-config-store";
-import { ModelScriptEditor } from "./model-script-editor";
+import { guessCapability, normalizeChannelModels, type ChannelModel, type ModelCapability, type ModelChannel } from "@/stores/use-config-store";
 import { ModelSelectModal } from "./model-select-modal";
 
-type ScriptTarget = { name: string; capability: ModelCapability; value: string };
-
-export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: boolean; channel: ModelChannel | null; onSave: (channel: ModelChannel) => void; onClose: () => void }) {
+export function ChannelEditorDrawer({
+    open,
+    channel,
+    onSave,
+    onClose,
+}: {
+    open: boolean;
+    channel: ModelChannel | null;
+    onSave: (channel: ModelChannel, apiKey: string) => Promise<ModelChannel>;
+    onClose: () => void;
+}) {
+    const { message } = App.useApp();
     const { t } = useTranslation();
     const [draft, setDraft] = useState<ModelChannel | null>(channel);
+    const [apiKey, setApiKey] = useState("");
     const [selectOpen, setSelectOpen] = useState(false);
-    const [scriptTarget, setScriptTarget] = useState<ScriptTarget | null>(null);
-    const apiFormatOptions: Array<{ label: string; value: ApiCallFormat }> = [
-        { label: "OpenAI", value: "openai" },
-        { label: "Gemini", value: "gemini" },
-        { label: t("config.protocols.ark"), value: "ark" },
-    ];
-    const capabilityOptions: Array<{ label: string; value: ModelCapability }> = ["image", "text"].map((value) => ({ label: t(`config.channelEditor.capabilities.${value}`), value: value as ModelCapability }));
+    const [saving, setSaving] = useState(false);
+    const capabilityOptions = (["image", "text"] as ModelCapability[]).map((value) => ({ label: t(`config.channelEditor.capabilities.${value}`), value }));
 
     useEffect(() => {
-        if (open && channel) setDraft(channel);
-    }, [open, channel]);
+        if (!open || !channel) return;
+        setDraft(channel);
+        setApiKey("");
+        setSelectOpen(false);
+    }, [channel, open]);
 
     if (!draft) return null;
 
     const patch = (value: Partial<ModelChannel>) => setDraft((current) => (current ? { ...current, ...value } : current));
     const setModels = (models: ChannelModel[]) => patch({ models });
+    const setCapability = (name: string, capability: ModelCapability) => setModels(draft.models.map((model) => (model.name === name ? { ...model, capability } : model)));
+    const removeModel = (name: string) => setModels(draft.models.filter((model) => model.name !== name));
 
-    const changeApiFormat = (apiFormat: ApiCallFormat) => {
-        const baseUrl = !draft.baseUrl.trim() || draft.baseUrl.trim() === defaultBaseUrlForApiFormat(draft.apiFormat) ? defaultBaseUrlForApiFormat(apiFormat) : draft.baseUrl;
-        patch({ apiFormat, baseUrl });
+    const persist = async () => {
+        if (!draft.name.trim() || !draft.baseUrl.trim() || (!draft.keyConfigured && !apiKey.trim())) {
+            message.error(t("config.channelEditor.required"));
+            return null;
+        }
+        setSaving(true);
+        try {
+            const saved = await onSave({ ...draft, name: draft.name.trim(), baseUrl: draft.baseUrl.trim(), models: normalizeChannelModels(draft.models) }, apiKey.trim());
+            setDraft(saved);
+            setApiKey("");
+            return saved;
+        } catch (error) {
+            message.error(error instanceof Error ? error.message : t("config.channelEditor.saveFailed"));
+            return null;
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const openModelSelector = async () => {
+        const saved = await persist();
+        if (saved) setSelectOpen(true);
+    };
+
+    const saveAndClose = async () => {
+        if (await persist()) onClose();
     };
 
     const applySelection = (names: string[]) => {
-        const map = new Map(draft.models.map((model) => [model.name, model]));
-        setModels(names.map((name) => map.get(name) || { name, capability: guessCapability(name) }));
-    };
-
-    const setCapability = (name: string, capability: ModelCapability) => setModels(draft.models.map((model) => (model.name === name ? { ...model, capability } : model)));
-    const setScript = (name: string, script: string) => setModels(draft.models.map((model) => (model.name === name ? { ...model, script: script || undefined } : model)));
-    const removeModel = (name: string) => setModels(draft.models.filter((model) => model.name !== name));
-
-    const save = () => {
-        onSave({ ...draft, name: draft.name.trim() || t("config.channels.unnamed"), models: normalizeChannelModels(draft.models) });
-        onClose();
+        const existing = new Map(draft.models.map((model) => [model.name, model]));
+        setModels(names.map((name) => existing.get(name) || { name, capability: guessCapability(name) }));
     };
 
     return (
@@ -59,28 +82,26 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
             extra={
                 <Space>
                     <Button onClick={onClose}>{t("common.cancel")}</Button>
-                    <Button type="primary" onClick={save}>
+                    <Button type="primary" loading={saving} onClick={() => void saveAndClose()}>
                         {t("common.save")}
                     </Button>
                 </Space>
             }
         >
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4">
                 <label className="block">
                     <span className="mb-1 block text-sm font-medium">{t("config.channelEditor.name")}</span>
                     <Input value={draft.name} onChange={(event) => patch({ name: event.target.value })} />
                 </label>
                 <label className="block">
-                    <span className="mb-1 block text-sm font-medium">{t("config.channelEditor.protocol")}</span>
-                    <Select className="w-full" value={draft.apiFormat} options={apiFormatOptions} onChange={changeApiFormat} />
-                </label>
-                <label className="block md:col-span-2">
                     <span className="mb-1 block text-sm font-medium">{t("config.channelEditor.baseUrl")}</span>
                     <Input value={draft.baseUrl} onChange={(event) => patch({ baseUrl: event.target.value })} placeholder="https://api.example.com" />
+                    <span className="mt-1 block text-xs text-stone-500">{t("config.channelEditor.httpsOnly")}</span>
                 </label>
-                <label className="block md:col-span-2">
+                <label className="block">
                     <span className="mb-1 block text-sm font-medium">API Key</span>
-                    <Input.Password value={draft.apiKey} onChange={(event) => patch({ apiKey: event.target.value })} placeholder="sk-..." />
+                    <Input.Password value={apiKey} autoComplete="new-password" onChange={(event) => setApiKey(event.target.value)} placeholder={draft.keyConfigured ? t("config.channelEditor.keepKey") : "sk-..."} />
+                    <span className="mt-1 block text-xs text-stone-500">{t("config.channelEditor.keySecurity")}</span>
                 </label>
             </div>
 
@@ -89,7 +110,7 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
                     <div className="text-sm font-semibold">{t("config.channelEditor.models")}</div>
                     <div className="mt-0.5 text-xs text-stone-500">{t("config.channelEditor.modelDescription", { count: draft.models.length })}</div>
                 </div>
-                <Button type="primary" icon={<ListPlus className="size-4" />} onClick={() => setSelectOpen(true)}>
+                <Button type="primary" icon={<ListPlus className="size-4" />} loading={saving} onClick={() => void openModelSelector()}>
                     {t("config.channelEditor.selectModels")}
                 </Button>
             </div>
@@ -103,9 +124,6 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
                             </span>
                             <div className="flex shrink-0 items-center gap-2">
                                 <Segmented size="small" value={model.capability} options={capabilityOptions} onChange={(value) => setCapability(model.name, value as ModelCapability)} />
-                                <Button size="small" type={model.script ? "primary" : "default"} ghost={Boolean(model.script)} onClick={() => setScriptTarget({ name: model.name, capability: model.capability, value: model.script || "" })}>
-                                    {t(model.script ? "config.channelEditor.scriptReady" : "config.channelEditor.script")}
-                                </Button>
                                 <Button size="small" danger type="text" icon={<Trash2 className="size-3.5" />} onClick={() => removeModel(model.name)} />
                             </div>
                         </div>
@@ -116,15 +134,6 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
             </div>
 
             <ModelSelectModal open={selectOpen} channel={draft} selectedNames={draft.models.map((model) => model.name)} onConfirm={applySelection} onClose={() => setSelectOpen(false)} />
-
-            <ModelScriptEditor
-                open={Boolean(scriptTarget)}
-                capability={scriptTarget?.capability || "text"}
-                modelName={scriptTarget?.name || ""}
-                value={scriptTarget?.value || ""}
-                onSave={(script) => scriptTarget && setScript(scriptTarget.name, script)}
-                onClose={() => setScriptTarget(null)}
-            />
         </Drawer>
     );
 }

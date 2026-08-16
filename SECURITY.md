@@ -27,7 +27,7 @@ Please include:
 - Impact and attack scenario.
 - Any relevant logs, screenshots, or proof of concept, with secrets removed.
 - Whether the issue affects local-only usage, hosted deployments, browser
-  storage, WebDAV sync, AI provider configuration, or API proxy behavior.
+  storage, anonymous sessions, AI provider configuration, or API proxy behavior.
 
 ## Scope
 
@@ -35,13 +35,14 @@ Please include:
 
 The canvas supports third-party node plugins loaded from a remote URL. By
 design, an installed plugin's code runs directly inside the web app with full
-access to the page, including locally stored data such as AI API keys. This is
-an intentional trade-off for extensibility, and the installer shows a warning
-before installing. Therefore:
+access to the page and browser-local canvas or media data. Provider API keys
+are encrypted on the server and are never returned to the plugin or web app.
+The installer shows a warning before installing. Therefore:
 
 - Only install plugins from sources you trust.
-- Reports that a *malicious plugin* can access page data or API keys are **out
-  of scope** — that is the documented behavior of the trust model.
+- Reports that a *malicious plugin* can access page data or invoke an AI action
+  available to the current anonymous session are **out of scope** — that is the
+  documented behavior of the trust model.
 - Reports **in scope** include: the app loading/executing plugin code without
   the install confirmation, a plugin escaping its declared node type to break
   core app integrity in ways not implied by "runs in the page", or the plugin
@@ -50,9 +51,9 @@ before installing. Therefore:
 Examples of in-scope reports:
 
 - Cross-site scripting or token exfiltration in the web app.
-- Exposure of locally stored API keys or synced canvas data caused by project
-  code.
-- Unsafe file handling, import/export behavior, or WebDAV proxy behavior.
+- Exposure of decrypted provider keys, anonymous-session data, or browser-local
+  canvas data caused by project code.
+- Unsafe file handling, import/export behavior, or restricted AI proxy behavior.
 - Authentication, authorization, or access-control flaws in project-managed
   features.
 - Supply-chain issues that are exploitable through this repository's shipped

@@ -1,9 +1,27 @@
 services:
-  app:
-    image: infinite-canvas:local
+  api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      NODE_ENV: development
+      APP_ORIGIN: http://localhost:3000
+      COOKIE_SECURE: "false"
+      API_KEY_MASTER_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DATABASE_PATH: /app/data/ionailabs-canvas.sqlite
+    volumes:
+      - ionailabs-canvas-local-data:/app/data
+    expose:
+      - "4000"
+
+  web:
     build:
       context: .
       dockerfile: Dockerfile
+    depends_on:
+      - api
     ports:
       - "3000:3000"
-    restart: unless-stopped
+
+volumes:
+  ionailabs-canvas-local-data:

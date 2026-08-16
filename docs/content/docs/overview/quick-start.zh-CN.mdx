@@ -1,48 +1,42 @@
 ---
 title: 快速开始
-description: 用最少步骤把 IonAiLabs无限画布跑起来
+description: 本地启动完整前后端或准备生产服务器
 ---
 
 # 快速开始
 
-如果你只是想先把项目跑起来，优先部署或启动 `web/` 前端。
+IonAiLabs无限画布现在需要同时运行 Vite/React 前端与 Node API，浏览器不会再直接请求模型中转站。
 
-## Vercel 部署
-
-在 Vercel 中导入仓库即可，根目录 `vercel.json` 会构建 `web/`。当前版本的 AI 请求由浏览器前台直连用户自己的 OpenAI 兼容地址，不需要额外配置服务端。
-
-## 本地启动
+## 本地 Docker 预览
 
 ```bash
 git clone git@github.com:basketikun/infinite-canvas.git
 cd infinite-canvas
-cd web
-bun install
-bun run dev
+docker compose -f docker-compose.local.yml up --build
 ```
 
-启动后访问：
+打开 `http://localhost:3000`。本地 Compose 使用仅供开发的主密钥和非安全 Cookie，不可直接用于公网服务器。
 
-```text
-http://localhost:3000
-```
-
-## Docker 启动
-
-如果你需要基于当前源码构建镜像：
+## 生产环境准备
 
 ```bash
-docker build -t infinite-canvas .
-docker run --rm -p 3000:3000 infinite-canvas
+cp .env.example .env
+openssl rand -base64 32
 ```
 
-## 首次使用建议
+将生成值写入 `API_KEY_MASTER_KEY`，把 `APP_ORIGIN` 改为最终 HTTPS 域名，并设置 `COOKIE_SECURE=true`，然后启动：
 
-- 先打开右上角配置弹窗，填入自己的 `Base URL`、`API Key` 和模型名。
-- 如果需要提示词仓库内容，打开 `/prompts` 会由浏览器前端直连拉取并缓存到 IndexedDB。
-- 如果需要跨设备同步画布、素材和生成记录，可在配置弹窗中填写 WebDAV。
+```bash
+mkdir -p data
+sudo chown -R 1000:1000 data
+chmod 700 data
+docker compose up -d --build
+```
 
-## 说明
+公网访问前还需配置宿主机 Nginx 和 TLS，并且只让 Nginx 暴露公网端口。详见 [Docker 部署](/zh-CN/docs/overview/docker)。
 
-- 当前画布项目和“我的素材”主要保存在浏览器本地，WebDAV 同步需要用户自行配置。
-- AI API Key 保存在浏览器本地，并由前端直接请求 OpenAI 兼容接口。
+## 配置第一个中转站
+
+打开配置，通过客服提示后添加公网 HTTPS 的 OpenAI 兼容 Base URL 与 API Key。可从 `/v1/models` 拉取模型；如果中转站没有模型列表，则手动添加图片或文本模型。
+
+画布和媒体继续保存在浏览器 IndexedDB；中转站配置按匿名 Cookie 隔离，并加密保存在服务器 SQLite。

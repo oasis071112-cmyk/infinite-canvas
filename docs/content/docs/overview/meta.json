@@ -5,7 +5,6 @@
   "pages": [
     "quick-start",
     "features",
-    "render",
     "docker",
     "third-party-prompt-repositories",
     "[Live Demo](https://canvas.best/)"

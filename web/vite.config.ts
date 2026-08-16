@@ -46,4 +46,12 @@ export default defineConfig({
     define: {
         __APP_VERSION__: JSON.stringify(localVersion),
     },
+    server: {
+        proxy: {
+            "/api": {
+                target: process.env.VITE_API_PROXY || "http://localhost:4000",
+                changeOrigin: true,
+            },
+        },
+    },
 });

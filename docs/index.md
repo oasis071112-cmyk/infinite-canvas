@@ -1,40 +1,18 @@
 # IonAiLabs Infinite Canvas Documentation Index
 
-## Overview
+This file is the AI-oriented documentation map. User-facing pages live under `docs/content/docs/`.
 
-- [Quick Start](/docs/overview/quick-start)
-- [Features](/docs/overview/features)
-- [Deploy on Render](/docs/overview/render)
-- [Docker Deployment](/docs/overview/docker)
-- [Third-party GitHub Prompt Repositories](/docs/overview/third-party-prompt-repositories)
+## Start here
 
-## Canvas Guide
+- `overview/quick-start.mdx`: start the complete frontend and Node API.
+- `overview/features.mdx`: current product capabilities and data boundaries.
+- `overview/docker.mdx`: production Compose, Nginx, SQLite, backup, and outbound-traffic notes.
+- `development/local-development.mdx`: source-development setup.
+- `canvas/`: canvas operation and shortcut references.
+- `progress/pending-test.mdx`: implemented changes awaiting manual verification.
+- `progress/todo.mdx`: future work.
+- `support/security.mdx`: responsible disclosure and security boundaries.
 
-- [Canvas Node Guide](/docs/canvas/canvas-node-manual)
-- [Canvas Shortcuts](/docs/canvas/canvas-shortcuts)
+## Current architecture
 
-## Development and Data
-
-- [Local Development](/docs/development/local-development)
-- [Canvas Data Structure](/docs/development/canvas-data-structure)
-
-## Business
-
-- [Open-source License](/docs/business/license)
-- [Business Cooperation](/docs/business/business)
-
-## Support and Security
-
-- [Report a Vulnerability](/docs/support/security)
-- [Sponsor the Project](/docs/support/sponsor)
-
-## Project Progress
-
-- [Changelog](/docs/progress/changelog)
-- [Pending Tests](/docs/progress/pending-test)
-- [TODO](/docs/progress/todo)
-
-## Notes
-
-- Canvas projects and My Assets are primarily stored in the browser. WebDAV can be configured for cross-device synchronization.
-- The AI API key is stored in the browser, which sends requests directly to OpenAI-compatible endpoints.
+The browser stores canvas projects, generated and imported media, audio, assets, and full generation history in IndexedDB. It calls only same-origin `/api` for AI work. The Node service stores anonymous sessions, AES-256-GCM-encrypted OpenAI-compatible provider settings, model assignments, and prompt-free call summaries in SQLite. WebDAV, native Gemini, native Volcengine Ark, and custom request scripts are not supported.

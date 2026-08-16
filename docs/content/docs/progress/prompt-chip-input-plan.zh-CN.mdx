@@ -59,7 +59,7 @@ Props：`value: string`、`references: CanvasResourceReference[]`、`onChange(va
 
 1. `npx tsc --noEmit` 通过。
 2. dev server 刷新后：
-   - 连一张图片到图片 / 视频节点 → 面板输入框输入 `@` → 菜单贴着光标弹出 → 选中 → **输入框内显示该图的真实缩略图 chip**（不再是「图片1」文字）。
+   - 连一张图片到图片节点 → 面板输入框输入 `@` → 菜单贴着光标弹出 → 选中 → **输入框内显示该图的真实缩略图 chip**（不再是「图片1」文字）。
    - 光标在 chip 后按一次 Backspace → 整个 chip 一次删除。
    - 普通文字 + chip 混排，回车触发生成；确认发给生成的 prompt 里引用仍是「图片1」文本（生成结果正常引用到图）。
    - 中文输入法输入不吞字、不误触发发送。

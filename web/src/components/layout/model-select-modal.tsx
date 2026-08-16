@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { fetchChannelModels } from "@/services/api/image";
 import type { ModelChannel } from "@/stores/use-config-store";
 
-// Channel model selector: fetch upstream models or add them manually, then include checked models in the channel list.
 export function ModelSelectModal({ open, channel, selectedNames, onConfirm, onClose }: { open: boolean; channel: ModelChannel | null; selectedNames: string[]; onConfirm: (names: string[]) => void; onClose: () => void }) {
     const { message } = App.useApp();
     const { t } = useTranslation();
@@ -17,16 +16,18 @@ export function ModelSelectModal({ open, channel, selectedNames, onConfirm, onCl
     const [search, setSearch] = useState("");
     const [manual, setManual] = useState("");
     const [loading, setLoading] = useState(false);
+    const selectedNamesKey = selectedNames.join("\u0000");
 
     useEffect(() => {
         if (!open) return;
-        setExisting(selectedNames);
+        const names = selectedNamesKey ? selectedNamesKey.split("\u0000") : [];
+        setExisting(names);
         setFetched([]);
-        setSelected(new Set(selectedNames));
-        setActiveTab(selectedNames.length ? "existing" : "new");
+        setSelected(new Set(names));
+        setActiveTab(names.length ? "existing" : "new");
         setSearch("");
         setManual("");
-    }, [open, selectedNames]);
+    }, [open, selectedNamesKey]);
 
     const currentList = activeTab === "new" ? fetched : existing;
     const visibleList = useMemo(() => {
@@ -60,11 +61,7 @@ export function ModelSelectModal({ open, channel, selectedNames, onConfirm, onCl
     };
 
     const fetchModels = async () => {
-        if (!channel) return;
-        if (!channel.baseUrl.trim() || !channel.apiKey.trim()) {
-            message.error(t("config.modelSelect.missingConfig"));
-            return;
-        }
+        if (!channel?.id) return;
         setLoading(true);
         try {
             const models = await fetchChannelModels(channel);
@@ -79,7 +76,7 @@ export function ModelSelectModal({ open, channel, selectedNames, onConfirm, onCl
     };
 
     const confirm = () => {
-        const ordered = [...existing, ...fetched].filter((name, index, list) => list.indexOf(name) === index).filter((name) => selected.has(name));
+        const ordered = [...existing, ...fetched].filter((name, index, list) => list.indexOf(name) === index && selected.has(name));
         onConfirm(ordered);
         onClose();
     };
@@ -97,53 +94,30 @@ export function ModelSelectModal({ open, channel, selectedNames, onConfirm, onCl
             }
             styles={{ body: { maxHeight: "62vh", overflowY: "auto" } }}
             footer={[
-                <Button key="cancel" onClick={onClose}>
-                    {t("common.cancel")}
-                </Button>,
-                <Button key="confirm" type="primary" onClick={confirm}>
-                    {t("config.modelSelect.confirm")}
-                </Button>,
+                <Button key="cancel" onClick={onClose}>{t("common.cancel")}</Button>,
+                <Button key="confirm" type="primary" onClick={confirm}>{t("config.modelSelect.confirm")}</Button>,
             ]}
         >
             <div className="flex flex-wrap items-center gap-3">
                 <Input className="min-w-[200px] flex-1" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("config.modelSelect.search")} prefix={<Search className="size-4 text-stone-400" />} allowClear />
                 <Input className="min-w-[180px] flex-1" value={manual} onChange={(event) => setManual(event.target.value)} onPressEnter={addManual} placeholder={t("config.modelSelect.modelName")} />
                 <Button onClick={addManual}>{t("config.modelSelect.add")}</Button>
-                <Button icon={<RefreshCw className="size-4" />} loading={loading} onClick={() => void fetchModels()}>
-                    {t("config.modelSelect.fetch")}
-                </Button>
+                <Button icon={<RefreshCw className="size-4" />} loading={loading} onClick={() => void fetchModels()}>{t("config.modelSelect.fetch")}</Button>
             </div>
             <div className="mt-2 text-xs text-stone-500">{t("config.modelSelect.description")}</div>
-
-            <Tabs
-                className="mt-3"
-                activeKey={activeTab}
-                onChange={setActiveTab}
-                items={[
-                    { key: "new", label: t("config.modelSelect.fetchedTab", { count: fetched.length }) },
-                    { key: "existing", label: t("config.modelSelect.existingTab", { count: existing.length }) },
-                ]}
-            />
-
+            <Tabs className="mt-3" activeKey={activeTab} onChange={setActiveTab} items={[{ key: "new", label: t("config.modelSelect.fetchedTab", { count: fetched.length }) }, { key: "existing", label: t("config.modelSelect.existingTab", { count: existing.length }) }]} />
             <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="text-xs text-stone-500">{t("config.modelSelect.visibleSelected", { selected: visibleSelectedCount, total: visibleList.length })}</span>
                 <div className="flex gap-2">
-                    <Button size="small" disabled={!visibleList.length} onClick={() => selectVisible(true)}>
-                        {t("config.modelSelect.selectVisible")}
-                    </Button>
-                    <Button size="small" disabled={!visibleSelectedCount} onClick={() => selectVisible(false)}>
-                        {t("config.modelSelect.clearVisible")}
-                    </Button>
+                    <Button size="small" disabled={!visibleList.length} onClick={() => selectVisible(true)}>{t("config.modelSelect.selectVisible")}</Button>
+                    <Button size="small" disabled={!visibleSelectedCount} onClick={() => selectVisible(false)}>{t("config.modelSelect.clearVisible")}</Button>
                 </div>
             </div>
-
             {visibleList.length ? (
                 <div className="grid grid-cols-1 gap-x-8 gap-y-3 md:grid-cols-2">
                     {visibleList.map((name) => (
                         <Checkbox key={name} checked={selected.has(name)} onChange={(event) => toggle(name, event.target.checked)}>
-                            <span className="truncate" title={name}>
-                                {name}
-                            </span>
+                            <span className="truncate" title={name}>{name}</span>
                         </Checkbox>
                     ))}
                 </div>

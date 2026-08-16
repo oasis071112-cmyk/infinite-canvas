@@ -9,7 +9,7 @@ COPY CHANGELOG.md /app/CHANGELOG.md
 COPY web ./
 RUN bun run build
 
-# 运行镜像：只启动静态前端，AI 请求由浏览器前台直连用户自己的接口。
+# 运行镜像：提供静态前端，并把同源 /api 转发到 Compose 内部的 Node 服务。
 FROM nginx:1.27-alpine
 
 COPY --from=web-build /app/web/dist /usr/share/nginx/html

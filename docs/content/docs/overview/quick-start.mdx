@@ -1,38 +1,42 @@
 ---
 title: Quick Start
-description: Run IonAiLabs Infinite Canvas in a few steps
+description: Start the full-stack application locally or prepare a production host
 ---
 
 # Quick Start
 
-To try the project, deploy or start the `web/` frontend.
+IonAiLabs Infinite Canvas now requires both the Vite/React frontend and the Node API. The browser never calls an AI provider directly.
 
-## Deploy with Vercel
-
-Import the repository into Vercel. The root `vercel.json` builds `web/`. AI requests are sent directly from the browser to your OpenAI-compatible endpoint, so no additional application server is required.
-
-## Run locally
+## Local Docker preview
 
 ```bash
 git clone git@github.com:basketikun/infinite-canvas.git
-cd infinite-canvas/web
-bun install
-bun run dev
+cd infinite-canvas
+docker compose -f docker-compose.local.yml up --build
 ```
 
-Open `http://localhost:3000`.
+Open `http://localhost:3000`. The local Compose file uses a development-only master key and an insecure cookie, so do not use it on a public server.
 
-## Run with Docker
+## Production preparation
 
 ```bash
-docker build -t infinite-canvas .
-docker run --rm -p 3000:3000 infinite-canvas
+cp .env.example .env
+openssl rand -base64 32
 ```
 
-## First-time setup
+Put the generated value in `API_KEY_MASTER_KEY`, set `APP_ORIGIN` to the final HTTPS origin, and set `COOKIE_SECURE=true`. Then start the stack:
 
-- Open Settings and enter your `Base URL`, `API Key`, and model names.
-- Open `/prompts` to fetch prompt repositories directly from the browser and cache them in IndexedDB.
-- Configure WebDAV if you want to synchronize canvases, assets, and generation history across devices.
+```bash
+mkdir -p data
+sudo chown -R 1000:1000 data
+chmod 700 data
+docker compose up -d --build
+```
 
-Canvas projects and My Assets are primarily stored in the browser. The API key is also stored locally and used by the browser to call OpenAI-compatible endpoints directly.
+Configure host Nginx and TLS before public access. Only Nginx should expose a public port. See [Docker Deployment](/docs/overview/docker).
+
+## First provider
+
+Open Settings, continue past the contact prompt, then add a public HTTPS OpenAI-compatible Base URL and API Key. Refresh models from `/v1/models`, or add image and text models manually when the provider does not expose a model list.
+
+Canvas projects and media remain in browser IndexedDB. Provider settings are scoped to the anonymous cookie and stored encrypted in server SQLite.

@@ -1,56 +1,46 @@
 ---
 title: Features
-description: Major features available in the current project
+description: Product capabilities, storage boundaries, and AI request flow
 ---
 
-# Features
+# IonAiLabs Infinite Canvas
 
-## Canvas projects
+IonAiLabs Infinite Canvas combines visual canvas workflows, image generation and editing, text generation, local audio assets, prompt libraries, and reusable materials in one workspace.
 
-- Create, rename, delete, import, export, and batch-manage canvas projects.
-- Persist nodes, connections, viewport, and background in the browser.
-- Optionally synchronize canvases, assets, image history, and local media through WebDAV.
+## Canvas and local data
 
-## IonAiLabs Infinite Canvas
+- Create multiple canvas projects with draggable, resizable, connectable nodes.
+- Keep canvas projects, imported images, generated images, audio files, assets, and complete generation history in browser IndexedDB.
+- Import and export canvas data locally. The server does not store canvas or media files.
+- Clearing the anonymous-session cookie does not remove local canvas data, but the browser will receive a new server-side provider scope.
 
-- Pan, zoom, reset the view, use the minimap, and choose lines, dots, or a blank background.
-- Select multiple nodes, copy and paste, undo and redo, and export the canvas or selected elements.
-- Connect nodes and highlight upstream and downstream relationships.
+## Anonymous AI configuration
 
-## Nodes and generation workflows
+- No registration, username, email address, or password is required.
+- The backend creates a random anonymous session in an `HttpOnly`, `Secure`, `SameSite=Strict` cookie and rolls its one-year expiry on activity.
+- Each session may store multiple public HTTPS OpenAI-compatible providers.
+- Provider keys are submitted over HTTPS, encrypted with AES-256-GCM, and never returned to the browser or included in exports.
+- Models can be refreshed from `/v1/models` or added manually and marked for image or text use.
 
-Built-in nodes cover text, images, audio, generation configuration, and groups.
+## Restricted same-origin AI gateway
 
-- Text nodes store prompts, copy, and AI-generated text.
-- Image nodes display uploaded, generated, or saved images while preserving their original ratio by default.
-- Audio nodes play uploaded audio and support replacement and downloads.
-- Configuration nodes combine upstream text, image, and audio inputs with the matching model settings.
-- Group nodes organize related canvas content.
+The browser calls only same-origin `/api` endpoints. The Node service resolves the selected provider and supports these upstream operations:
 
-Batch image generation keeps all results in an image group and lets users select the primary result.
+- OpenAI-compatible Responses
+- Image generations
+- Image edits
+- Model listing
 
-## AI generation
+There is no arbitrary-path proxy. Native Gemini, native Volcengine Ark, custom request scripts, and WebDAV are not supported. Provider URLs must use public HTTPS and are revalidated before every request; redirects and private, loopback, link-local, reserved, and cloud-metadata targets are rejected.
 
-- Connect directly from the browser to user-provided compatible endpoints.
-- Use image generation and editing, Responses-based text generation, and model discovery endpoints.
-- Configure multiple providers and assign image or text capabilities to each model.
-- Control image quality, aspect ratio, transparent backgrounds, output count, text reasoning effort, and custom invocation scripts.
-- Keep Volcengine Ark image generation support.
+## Server-side records
 
-Prompt panels support `@` references to connected images, text, and audio. Image references render as thumbnails and are renumbered automatically when sent.
+SQLite stores anonymous sessions, encrypted provider settings, model assignments, and minimal call summaries. Summaries contain model, capability, status, HTTP status, duration, error code, and time only. They do not contain prompts, messages, reference images, audio, canvas data, or generated results, and expire after 90 days by default.
 
-## Plugin system
+## Other capabilities
 
-Canvas plugins can contribute node types, rendering, inspectors, serialization, toolbar actions, panels, and optional text or image generation capabilities. Built-in and local plugins are managed through the canvas UI.
+- Prompt Center with browser-side synchronization and IndexedDB caching for supported public repositories.
+- Local image and audio asset management.
+- Remote canvas-node plugins. Plugins run in the page and may access browser-local canvas data, but they cannot read decrypted provider keys.
 
-## Prompts and assets
-
-- Synchronize supported public prompt repositories and add custom standard JSON sources.
-- Search enabled sources, filter by tags, inspect prompt details, copy prompts, and insert them into the canvas.
-- Store reusable text and image assets in the browser.
-
-## Current limitations
-
-- The project is frontend-first and does not provide built-in cloud accounts or cloud storage.
-- API keys remain in browser storage and requests are sent directly to configured providers.
-- Production Docker static-resource paths still require broader deployment verification.
+See [Quick Start](/docs/overview/quick-start) and [Docker Deployment](/docs/overview/docker) for setup.

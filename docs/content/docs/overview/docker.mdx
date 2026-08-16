@@ -1,62 +1,44 @@
 ---
 title: Docker Deployment
-description: Deploy IonAiLabs Infinite Canvas with Docker Compose
+description: Deploy the frontend, Node API, SQLite, and Nginx on one server
 ---
 
 # Docker Deployment
 
-## Use the published image
+The production Compose stack runs one Node API process and one internal Nginx container. SQLite uses WAL mode and persists under `./data`. The container Nginx serves the Vite build and forwards `/api` to the API container with request and response buffering disabled.
+
+## Prepare configuration
 
 ```bash
-git clone git@github.com:basketikun/infinite-canvas.git
-cd infinite-canvas
-docker compose up -d
+cp .env.example .env
+openssl rand -base64 32
 ```
 
-Open `http://localhost:3000`.
+Set a stable `API_KEY_MASTER_KEY`, the final HTTPS `APP_ORIGIN`, and `COOKIE_SECURE=true`. Losing or changing the master key makes existing provider keys unreadable; users must enter them again.
 
-## Build locally
+## Start
 
 ```bash
-docker compose -f docker-compose.local.yml up -d --build
+mkdir -p data
+sudo chown -R 1000:1000 data
+chmod 700 data
+docker compose up -d --build
 ```
 
-## Documentation image
+The web container binds only to `127.0.0.1:3000`. Use the example at `deploy/nginx-site.conf.example` for the host reverse proxy and TLS termination. Do not publish the API container directly.
 
-The documentation in `docs/` is a separate Next.js standalone application with server capabilities.
+## Data and backups
+
+The server stores only anonymous sessions, encrypted providers, model assignments, and call summaries in `data/ionailabs-canvas.sqlite`. It does not store canvas projects, generated images, imported media, audio, prompts, or full generation history.
+
+Create an online SQLite backup with:
 
 ```bash
-cd docs
-docker compose up -d
+docker compose exec api npm run backup
 ```
 
-To build it from the current source:
+Stop the stack before restoring a backup. Preserve both the database and the exact `API_KEY_MASTER_KEY`. Detailed commands and the outbound-traffic boundary are documented in `deploy/README.md`.
 
-```bash
-cd docs
-docker compose -f docker-compose.local.yml up -d --build
-```
+## Resource boundary
 
-The main application container only runs Next.js. Canvases, My Assets, generation history, and API keys are stored in the browser by default, while prompt repositories are fetched directly by the frontend. No persistent data volume is required for this data.
-
-## Optional analytics
-
-No analytics are enabled by default. A deployment can enable GA4, Baidu Analytics, or both at runtime:
-
-| Variable | Description |
-| --- | --- |
-| `ANALYTICS_GA4_ID` | Google Analytics 4 measurement ID (`G-XXXX`) |
-| `ANALYTICS_BAIDU_ID` | Baidu site ID, the hash after `hm.js?` |
-
-```yaml
-services:
-  app:
-    image: ghcr.io/basketikun/infinite-canvas:latest
-    ports:
-      - "3000:3000"
-    environment:
-      ANALYTICS_GA4_ID: G-XXXXXXXXXX
-      ANALYTICS_BAIDU_ID: e8263761cc5c32f5f7a855b8203b965a
-```
-
-SPA route changes automatically report page views to enabled providers. Only configure analytics IDs on sites you control, and do not commit them to the repository.
+The stack is designed for a small single server, but model requests and streamed media still create public outbound traffic. Browser-local media storage reduces disk usage; it does not eliminate network egress.

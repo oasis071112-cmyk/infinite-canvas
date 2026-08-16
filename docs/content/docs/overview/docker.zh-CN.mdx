@@ -1,91 +1,44 @@
 ---
 title: Docker 部署
-description: 使用 Docker Compose 部署 IonAiLabs无限画布
+description: 在一台服务器部署前端、Node API、SQLite 与 Nginx
 ---
 
 # Docker 部署
 
-如果你希望在自己的机器或服务器上运行项目，可以直接使用 Docker Compose。
+生产 Compose 运行一个 Node API 进程和一个内部 Nginx 容器。SQLite 使用 WAL 模式并持久化到 `./data`；容器内 Nginx 提供 Vite 静态页面，并将 `/api` 转发到 API 容器，同时关闭请求与响应缓冲以支持流式传输。
 
-## 使用发布镜像
-
-```bash
-git clone git@github.com:basketikun/infinite-canvas.git
-cd infinite-canvas
-docker compose up -d
-```
-
-启动后访问：
-
-```text
-http://localhost:3000
-```
-
-## 本地构建镜像
-
-如果需要基于当前源码构建镜像：
+## 准备配置
 
 ```bash
-docker compose -f docker-compose.local.yml up -d --build
+cp .env.example .env
+openssl rand -base64 32
 ```
 
-## 文档站镜像
+配置稳定的 `API_KEY_MASTER_KEY`、最终 HTTPS `APP_ORIGIN`，并设置 `COOKIE_SECURE=true`。主密钥丢失或更换后，已有渠道 Key 将无法解密，用户需要重新填写。
 
-文档站位于 `docs/` 目录，按带服务端能力的 Next.js standalone 应用单独构建，不打进主应用镜像。
-
-使用发布镜像：
+## 启动
 
 ```bash
-cd docs
-docker compose up -d
+mkdir -p data
+sudo chown -R 1000:1000 data
+chmod 700 data
+docker compose up -d --build
 ```
 
-基于当前源码本地构建：
+Web 容器只绑定 `127.0.0.1:3000`。宿主机反向代理与 TLS 可参考 `deploy/nginx-site.conf.example`，不要将 API 容器直接暴露到公网。
+
+## 数据与备份
+
+服务器只在 `data/ionailabs-canvas.sqlite` 保存匿名会话、加密渠道、模型分配和调用摘要，不保存画布项目、生成图片、导入媒体、音频、提示词或完整生成历史。
+
+在线创建 SQLite 备份：
 
 ```bash
-cd docs
-docker compose -f docker-compose.local.yml up -d --build
+docker compose exec api npm run backup
 ```
 
-## 数据说明
+恢复备份前先停止服务，同时保留数据库和完全一致的 `API_KEY_MASTER_KEY`。详细命令与出站流量边界见 `deploy/README.md`。
 
-当前主应用镜像只启动 Next.js。画布、我的素材、生成记录和 AI API Key 默认保存在浏览器本地；第三方提示词由浏览器前端直连拉取，不需要额外挂载数据目录。
+## 资源边界
 
-## 统计分析（可选）
-
-项目**默认不接入任何统计**：不设置下列环境变量时，页面不会加载任何统计脚本，也不会发送任何外部请求。你在自己的部署上想查看流量时，设置对应环境变量即可，无需修改代码或重新构建镜像——镜像启动时会据此生成运行期配置。
-
-统计按「每家一个独立变量」配置：**填了谁就启用谁，可同时启用多家**（例如 GA4 + 百度一起开）。仅支持 GA4 与百度，两者都只接受 ID，脚本地址由代码固定拼接，不接受任意脚本地址或内联 JS。
-
-| 变量 | 说明 |
-| --- | --- |
-| `ANALYTICS_GA4_ID` | Google Analytics 4 衡量 ID（`G-XXXX`） |
-| `ANALYTICS_BAIDU_ID` | 百度统计站点 ID（`hm.js?` 后面那串 hash） |
-
-在 `docker-compose.yml` 的 `environment` 中配置（文件内已附注释示例），下例同时启用 GA4 与百度：
-
-```yaml
-services:
-  app:
-    image: ghcr.io/basketikun/infinite-canvas:latest
-    ports:
-      - "3000:3000"
-    environment:
-      ANALYTICS_GA4_ID: G-XXXXXXXXXX
-      ANALYTICS_BAIDU_ID: e8263761cc5c32f5f7a855b8203b965a
-```
-
-或使用 `docker run`：
-
-```bash
-docker run -d -p 3000:3000 \
-  -e ANALYTICS_GA4_ID=G-XXXXXXXXXX \
-  -e ANALYTICS_BAIDU_ID=e8263761cc5c32f5f7a855b8203b965a \
-  ghcr.io/basketikun/infinite-canvas:latest
-```
-
-单页应用的路由切换会自动向所有已启用的统计上报 pageview。
-
-<Callout type="warn">
-请只在你自己的站点上配置统计 ID，不要把 ID 提交进仓库；fork 或自托管本项目的用户默认不会产生任何统计。
-</Callout>
+该结构面向小型单机服务器，但模型请求和流式媒体仍会产生公网出站流量。媒体保存在浏览器只能减少服务器磁盘占用，不能消除网络出站。

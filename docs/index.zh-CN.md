@@ -1,40 +1,18 @@
 # IonAiLabs无限画布文档索引
 
-## 项目介绍
+本文件是面向 AI 的文档地图，用户可见正文位于 `docs/content/docs/`。
 
-- [快速开始](/zh-CN/docs/overview/quick-start)
-- [功能介绍](/zh-CN/docs/overview/features)
-- [Render 部署](/zh-CN/docs/overview/render)
-- [Docker 部署](/zh-CN/docs/overview/docker)
-- [第三方 GitHub 提示词仓库](/zh-CN/docs/overview/third-party-prompt-repositories)
+## 建议入口
 
-## 操作手册
+- `overview/quick-start.zh-CN.mdx`：启动完整前端与 Node API。
+- `overview/features.zh-CN.mdx`：当前产品能力与数据边界。
+- `overview/docker.zh-CN.mdx`：生产 Compose、Nginx、SQLite、备份与出站流量说明。
+- `development/local-development.zh-CN.mdx`：源码开发方式。
+- `canvas/`：画布操作与快捷键。
+- `progress/pending-test.zh-CN.mdx`：已实现但待人工验收的变化。
+- `progress/todo.zh-CN.mdx`：后续事项。
+- `support/security.zh-CN.mdx`：漏洞提交与安全边界。
 
-- [画布节点操作手册](/zh-CN/docs/canvas/canvas-node-manual)
-- [画布快捷键](/zh-CN/docs/canvas/canvas-shortcuts)
+## 当前架构
 
-## 开发与数据
-
-- [本地开发](/zh-CN/docs/development/local-development)
-- [画布数据结构](/zh-CN/docs/development/canvas-data-structure)
-
-## 商务合作
-
-- [开源协议](/zh-CN/docs/business/license)
-- [商务合作](/zh-CN/docs/business/business)
-
-## 支持与安全
-
-- [漏洞提交](/zh-CN/docs/support/security)
-- [赞助支持](/zh-CN/docs/support/sponsor)
-
-## 项目进度
-
-- [更新日志](/zh-CN/docs/progress/changelog)
-- [待测试](/zh-CN/docs/progress/pending-test)
-- [TODO](/zh-CN/docs/progress/todo)
-
-## 说明
-
-- 当前画布项目和“我的素材”主要保存在浏览器本地，跨设备可自行配置 WebDAV 同步。
-- AI API Key 保存在浏览器本地，并由前端直接请求 OpenAI 兼容接口。
+浏览器 IndexedDB 保存画布项目、生成和导入媒体、音频、素材及完整生成历史；AI 请求只访问同域 `/api`。Node 服务在 SQLite 保存匿名会话、AES-256-GCM 加密的 OpenAI 兼容渠道、模型分配和不含提示词的调用摘要。不支持 WebDAV、原生 Gemini、原生火山方舟或自定义请求脚本。
