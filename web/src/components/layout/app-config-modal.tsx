@@ -1,10 +1,11 @@
 import { App, Button, Form, Input, Modal, Progress, Tabs } from "antd";
 import type { TFunction } from "i18next";
-import { Cloud, Download, KeyRound, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "lucide-react";
+import { Cloud, Download, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ModelPicker } from "@/components/model-picker";
+import { ApiKeyContactModal } from "@/components/layout/api-key-contact-modal";
 import { ChannelEditorDrawer } from "@/components/layout/channel-editor-drawer";
 import { ConfigPromptSources } from "@/components/layout/config-prompt-sources";
 import { ConfigLocalStorage } from "@/components/layout/config-local-storage";
@@ -318,27 +319,7 @@ export function AppConfigModal() {
 
     return (
         <>
-            <Modal open={isConfigOpen && showContact} width={460} centered footer={null} onCancel={closeConfig} styles={{ body: { padding: "28px 24px 24px" } }}>
-                <div className="mx-auto flex max-w-sm flex-col items-center text-center">
-                    <div className="grid size-11 place-items-center rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
-                        <KeyRound className="size-5" />
-                    </div>
-                    <h2 className="mt-4 text-xl font-semibold tracking-tight text-stone-950 dark:text-stone-100">{t("config.apiKeyContact.title")}</h2>
-                    <p className="mt-2 text-sm leading-6 text-stone-600 dark:text-stone-300">{t("config.apiKeyContact.description")}</p>
-                    <div className="mt-5 aspect-square w-[280px] max-w-full overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm dark:border-stone-700">
-                        <img src="/api-key-contact.jpg" alt={t("config.apiKeyContact.imageAlt")} className="size-full scale-[1.45] object-cover" />
-                    </div>
-                    <p className="mt-3 text-xs text-stone-500 dark:text-stone-400">{t("config.apiKeyContact.scanHint")}</p>
-                    <div className="mt-6 grid w-full grid-cols-2 gap-3">
-                        <Button className="h-10" onClick={closeConfig}>
-                            {t("config.apiKeyContact.later")}
-                        </Button>
-                        <Button type="primary" className="h-10" onClick={() => setShowContact(false)}>
-                            {t("config.apiKeyContact.continue")}
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
+            <ApiKeyContactModal open={isConfigOpen && showContact} onClose={closeConfig} onContinue={() => setShowContact(false)} />
             <Modal
                 title={
                     <div>
