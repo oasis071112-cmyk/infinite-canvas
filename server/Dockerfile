@@ -1,4 +1,6 @@
-FROM node:22-bookworm-slim AS build
+ARG NODE_IMAGE=node:22-bookworm-slim
+
+FROM ${NODE_IMAGE} AS build
 
 WORKDIR /app
 COPY server/package.json server/package-lock.json ./
@@ -7,7 +9,7 @@ COPY server/tsconfig.json ./
 COPY server/src ./src
 RUN npm run build && npm prune --omit=dev
 
-FROM node:22-bookworm-slim
+FROM ${NODE_IMAGE}
 
 ENV NODE_ENV=production
 WORKDIR /app
